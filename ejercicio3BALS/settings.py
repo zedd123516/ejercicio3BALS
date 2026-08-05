@@ -142,3 +142,4 @@ DEFAULT_FROM_EMAIL = 'HotelZ <noreply@hotelz.com>'
 # EMAIL_HOST_USER = 'tu_correo@gmail.com'
 # EMAIL_HOST_PASSWORD = 'tu_contraseña_de_aplicacion'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
