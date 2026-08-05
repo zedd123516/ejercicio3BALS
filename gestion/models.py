@@ -53,6 +53,7 @@ class Habitacion(models.Model):
         null=True,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])]
     )
+    orden = models.PositiveIntegerField(default=0, help_text="Orden de visualización de la habitación")
 
     def __str__(self):
         return f"Habitación {self.numero}"

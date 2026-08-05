@@ -34,8 +34,8 @@
                 </thead>
                 <tbody>
                     {% for habitacion in habitaciones %}
-                    <tr>
-                        <td>{{ habitacion.numero }}</td>
+                    <tr class="draggable-row" draggable="true" data-habitacion-id="{{ habitacion.id }}">
+                        <td><span class="text-muted me-2" style="cursor: move;"><i class="bi bi-grip-horizontal"></i></span>{{ habitacion.numero }}</td>
                         <td>{{ habitacion.tipo }}</td>
                         <td>
                             {% if habitacion.imagen %}
@@ -58,7 +58,7 @@
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="7" class="text-center text-muted">No hay habitaciones registradas</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted">No hay habitaciones registradas</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -67,5 +67,90 @@
 
     <script>
         let table = new DataTable('#tbl_habitaciones');
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+        const tbody = document.querySelector('#tbl_habitaciones tbody');
+        let draggedRow = null;
+
+        function actualizarOrdenHabitaciones() {
+            const filas = Array.from(tbody.querySelectorAll('tr.draggable-row'));
+            const orden = filas.map((fila, index) => ({
+                id: parseInt(fila.dataset.habitacionId, 10),
+                orden: index + 1
+            }));
+
+            fetch('/guardar-orden-habitaciones/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ orden })
+            }).then(response => response.json())
+              .then(data => {
+                  if (!data.success) {
+                      console.error('Error guardando orden:', data.error);
+                  }
+              }).catch(error => {
+                  console.error('Error guardando orden:', error);
+              });
+        }
+
+        function activarDragAndDrop() {
+            tbody.querySelectorAll('tr.draggable-row').forEach(row => {
+                row.addEventListener('dragstart', function (event) {
+                    draggedRow = this;
+                    event.dataTransfer.effectAllowed = 'move';
+                });
+
+                row.addEventListener('dragover', function (event) {
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = 'move';
+                    this.classList.add('table-primary');
+                });
+
+                row.addEventListener('dragleave', function () {
+                    this.classList.remove('table-primary');
+                });
+
+                row.addEventListener('drop', function (event) {
+                    event.preventDefault();
+                    this.classList.remove('table-primary');
+                    if (!draggedRow || draggedRow === this) {
+                        return;
+                    }
+                    const bounding = this.getBoundingClientRect();
+                    const offset = event.clientY - bounding.top;
+                    if (offset > bounding.height / 2) {
+                        this.parentNode.insertBefore(draggedRow, this.nextSibling);
+                    } else {
+                        this.parentNode.insertBefore(draggedRow, this);
+                    }
+                    actualizarOrdenHabitaciones();
+                });
+
+                row.addEventListener('dragend', function () {
+                    draggedRow = null;
+                    tbody.querySelectorAll('tr.draggable-row').forEach(r => r.classList.remove('table-primary'));
+                });
+            });
+        }
+
+        activarDragAndDrop();
     </script>
-{% endblock %}3
+{% endblock %}

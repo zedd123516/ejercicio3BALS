@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.db.models import Count, Sum
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -597,6 +598,9 @@ def guardarHabitacion(request):
         messages.error(request, f"La habitación N° {numero} ya está ingresada en el sistema.")
         return redirect('/nueva-habitacion/')
 
+    ultimo_orden = Habitacion.objects.order_by('-orden').first()
+    orden_siguiente = ultimo_orden.orden + 1 if ultimo_orden else 1
+
     try:
         Habitacion.objects.create(
             numero=numero,
@@ -605,7 +609,8 @@ def guardarHabitacion(request):
             precio_noche=precio_noche,
             piso=piso,
             estado=estado,
-            imagen=imagen
+            imagen=imagen,
+            orden=orden_siguiente
         )
         messages.success(request, "Habitación guardada exitosamente")
     except IntegrityError:
@@ -1067,8 +1072,27 @@ def eliminarFactura(request, id):
 
 # VISTAS LISTA PARA CADA TABLA
 def habitaciones_lista(request):
-    habitaciones = Habitacion.objects.all().order_by('numero')
+    habitaciones = Habitacion.objects.all().order_by('orden', 'numero')
     return render(request, 'hotel/habitaciones.html', {'habitaciones': habitaciones})
+
+
+@requiere_admin
+def guardar_orden_habitaciones(request):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
+
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        orden_data = data.get('orden', [])
+        for item in orden_data:
+            habitacion_id = item.get('id')
+            orden = item.get('orden')
+            if habitacion_id is None or orden is None:
+                continue
+            Habitacion.objects.filter(id=habitacion_id).update(orden=orden)
+        return JsonResponse({'success': True})
+    except Exception as exc:
+        return JsonResponse({'success': False, 'error': str(exc)}, status=400)
 
 
 def huespedes_lista(request):

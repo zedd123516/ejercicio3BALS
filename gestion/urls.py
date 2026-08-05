@@ -54,6 +54,7 @@ urlpatterns = [
     # Habitaciones
     path('nueva-habitacion/', views.nuevaHabitacion),
     path('guardar-habitacion/', views.guardarHabitacion),
+    path('guardar-orden-habitaciones/', views.guardar_orden_habitaciones),
     path('editar-habitacion/<id>/', views.editarHabitacion),
     path('procesar-actualizacion-habitacion/', views.procesarActualizacionHabitacion),
     path('eliminar-habitacion/<id>/', views.eliminarHabitacion),
