@@ -166,9 +166,9 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-end fw-bold text-success fs-6">${{ canal.adr }}</td>
-                            <td class="text-end fw-bold text-primary fs-6">${{ canal.revpar_aporte }}</td>
-                            <td class="text-end fw-bold text-dark fs-6">${{ canal.ingreso }}</td>
+                            <td class="text-end fw-bold text-success fs-6">${{ canal.adr|floatformat:2 }}</td>
+                            <td class="text-end fw-bold text-primary fs-6">${{ canal.revpar_aporte|floatformat:2 }}</td>
+                            <td class="text-end fw-bold text-dark fs-6">${{ canal.ingreso|floatformat:2 }}</td>
                         </tr>
                         {% empty %}
                         <tr>

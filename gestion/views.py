@@ -438,19 +438,20 @@ def obtener_metricas_hotel():
     facturas = Factura.objects.all()
 
     total_habitaciones = max(habitaciones.count(), 1)
+    reservas_validas = reservas.exclude(estado='cancelada')
     reservas_activas = reservas.filter(estado__in=['confirmada', 'checked_in'])
     
     total_ingresos_facturas = facturas.filter(estado='pagada').aggregate(total=Sum('total'))['total'] or 0
-    total_ingresos_reservas = reservas.filter(estado__in=['confirmada', 'checked_in', 'checked_out']).aggregate(total=Sum('tarifa_base'))['total'] or 0
+    total_ingresos_reservas = reservas_validas.aggregate(total=Sum('tarifa_base'))['total'] or 0
     total_ingresos = float(total_ingresos_facturas if total_ingresos_facturas > 0 else total_ingresos_reservas)
 
     cant_activas = reservas_activas.count()
-    cant_total_reservas = max(reservas.count(), 1)
+    cant_total_reservas = max(reservas_validas.count(), 1)
     cant_ocupadas = max(cant_activas, 1)
 
     ocupacion = round((cant_activas / total_habitaciones) * 100, 1) if habitaciones.exists() else 0
     revpar = round(total_ingresos / total_habitaciones, 2) if habitaciones.exists() else 0
-    adr = round(total_ingresos / cant_ocupadas, 2) if cant_activas > 0 else (round(total_ingresos / cant_total_reservas, 2) if reservas.exists() else 0)
+    adr = round(total_ingresos / cant_ocupadas, 2) if cant_activas > 0 else (round(total_ingresos / cant_total_reservas, 2) if reservas_validas.exists() else 0)
 
     CANAL_MAP = {
         'directo': 'Directo (Web/Recepción)',
@@ -459,8 +460,8 @@ def obtener_metricas_hotel():
         'corporativo': 'Convenio Corporativo',
     }
 
-    raw_canales = list(reservas.values('canal_origen').annotate(cantidad=Count('id'), ingreso=Sum('tarifa_base')).order_by('-cantidad'))
-    raw_dict = {item['canal_origen']: item for item in raw_canales}
+    raw_canales = list(reservas_validas.values('canal_origen').annotate(cantidad=Count('id'), ingreso=Sum('tarifa_base')).order_by('-cantidad'))
+    raw_dict = {item['canal_origen'].lower(): item for item in raw_canales if item.get('canal_origen')}
 
     canales_list = []
     labels = []
@@ -473,7 +474,7 @@ def obtener_metricas_hotel():
         data = raw_dict.get(code, {'cantidad': 0, 'ingreso': 0})
         cant = data['cantidad']
         ing = float(data['ingreso'] or 0)
-        pct = round((cant / cant_total_reservas) * 100, 1) if cant > 0 else 0
+        pct = round((cant / cant_total_reservas) * 100, 1) if (cant > 0 and reservas_validas.exists()) else 0
         c_adr = round(ing / cant, 2) if cant > 0 else 0
         c_revpar = round(ing / total_habitaciones, 2)
 
@@ -481,10 +482,10 @@ def obtener_metricas_hotel():
             'canal_origen': code,
             'nombre': label,
             'cantidad': cant,
-            'ingreso': ing,
+            'ingreso': round(ing, 2),
             'porcentaje': pct,
-            'adr': c_adr,
-            'revpar_aporte': c_revpar,
+            'adr': round(c_adr, 2),
+            'revpar_aporte': round(c_revpar, 2),
         }
         canales_list.append(item)
 
@@ -499,9 +500,9 @@ def obtener_metricas_hotel():
 
     return {
         'total_habitaciones_cnt': habitaciones.count(),
-        'total_reservas_cnt': reservas.count(),
+        'total_reservas_cnt': reservas_validas.count(),
         'reservas_activas_cnt': cant_activas,
-        'total_ingresos': total_ingresos,
+        'total_ingresos': round(total_ingresos, 2),
         'ocupacion': ocupacion,
         'revpar': revpar,
         'adr': adr,
@@ -567,6 +568,16 @@ def nuevaHabitacion(request):
     return render(request, 'nuevoHotel/nuevaHabitacion.html')
 
 
+def _validar_imagen_habitacion(imagen):
+    if imagen is None:
+        return True, None
+
+    allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    if imagen.content_type not in allowed_types:
+        return False, "El archivo debe ser una imagen (jpg, jpeg, png, gif o webp)."
+    return True, None
+
+
 @requiere_admin
 def guardarHabitacion(request):
     numero = request.POST.get("numero", "").strip()
@@ -575,6 +586,12 @@ def guardarHabitacion(request):
     precio_noche = request.POST.get("precio_noche")
     piso = request.POST.get("piso")
     estado = request.POST.get("estado", "disponible")
+    imagen = request.FILES.get('imagen')
+
+    valido, error = _validar_imagen_habitacion(imagen)
+    if not valido:
+        messages.error(request, error)
+        return redirect('/nueva-habitacion/')
 
     if Habitacion.objects.filter(numero=numero).exists():
         messages.error(request, f"La habitación N° {numero} ya está ingresada en el sistema.")
@@ -587,7 +604,8 @@ def guardarHabitacion(request):
             capacidad=capacidad,
             precio_noche=precio_noche,
             piso=piso,
-            estado=estado
+            estado=estado,
+            imagen=imagen
         )
         messages.success(request, "Habitación guardada exitosamente")
     except IntegrityError:
@@ -617,6 +635,12 @@ def procesarActualizacionHabitacion(request):
         messages.error(request, f"La habitación N° {numero} ya está ingresada por otra habitación.")
         return redirect(f'/editar-habitacion/{id}/')
 
+    imagen = request.FILES.get('imagen')
+    valido, error = _validar_imagen_habitacion(imagen)
+    if not valido:
+        messages.error(request, error)
+        return redirect(f'/editar-habitacion/{id}/')
+
     try:
         habitacion = Habitacion.objects.get(id=id)
         habitacion.numero = numero
@@ -625,6 +649,8 @@ def procesarActualizacionHabitacion(request):
         habitacion.precio_noche = precio_noche
         habitacion.piso = piso
         habitacion.estado = estado
+        if imagen:
+            habitacion.imagen = imagen
         habitacion.save()
         messages.success(request, "Habitación actualizada exitosamente")
     except IntegrityError:

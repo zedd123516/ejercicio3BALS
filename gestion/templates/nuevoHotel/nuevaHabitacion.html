@@ -8,7 +8,7 @@
                 <br>
                 <h1><b>Registrar Nueva Habitación</b></h1>
                 <hr>
-                <form id="form_nueva_habitacion" action="/guardar-habitacion/" method="post">
+                <form id="form_nueva_habitacion" action="/guardar-habitacion/" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     
                     <b>Número de Habitación:</b> <br>
@@ -36,7 +36,12 @@
                     <b>Piso:</b> <br>
                     <input required placeholder="Ingrese el número de piso" class="form-control" type="number" name="piso" value="1">
                     <br>
-                    
+
+                    <b>Imagen de la habitación (solo imágenes):</b> <br>
+                    <input type="file" accept="image/*" class="form-control" name="imagen">
+                    <small class="text-muted">Se aceptan JPG, JPEG, PNG, GIF y WEBP.</small>
+                    <br>
+
                     <b>Estado:</b> <br>
                     <select class="form-control" name="estado">
                         <option value="disponible">Disponible</option>

@@ -24,6 +24,7 @@
                     <tr>
                         <th>Número</th>
                         <th>Tipo</th>
+                        <th>Foto</th>
                         <th>Capacidad</th>
                         <th>Precio</th>
                         <th>Piso</th>
@@ -36,6 +37,13 @@
                     <tr>
                         <td>{{ habitacion.numero }}</td>
                         <td>{{ habitacion.tipo }}</td>
+                        <td>
+                            {% if habitacion.imagen %}
+                                <img src="{{ habitacion.imagen.url }}" alt="Foto Habitación {{ habitacion.numero }}" style="width: 80px; height: auto; object-fit: cover; border-radius: 6px;">
+                            {% else %}
+                                <span class="text-muted">Sin foto</span>
+                            {% endif %}
+                        </td>
                         <td>{{ habitacion.capacidad }}</td>
                         <td>${{ habitacion.precio_noche }}</td>
                         <td>{{ habitacion.piso }}</td>

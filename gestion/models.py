@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import FileExtensionValidator
 
 
 class Agencia(models.Model):
@@ -46,6 +47,12 @@ class Habitacion(models.Model):
     precio_noche = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     piso = models.IntegerField(default=1)
     estado = models.CharField(max_length=20, choices=ESTADOS, default='disponible')
+    imagen = models.ImageField(
+        upload_to='habitaciones/',
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])]
+    )
 
     def __str__(self):
         return f"Habitación {self.numero}"

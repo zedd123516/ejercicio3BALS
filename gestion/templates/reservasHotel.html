@@ -484,9 +484,9 @@
                       </div>
                     </div>
                   </td>
-                  <td class="text-end fw-bold text-success">${{ canal.adr }}</td>
-                  <td class="text-end fw-bold text-primary">${{ canal.revpar_aporte }}</td>
-                  <td class="text-end fw-bold">${{ canal.ingreso }}</td>
+                  <td class="text-end fw-bold text-success">${{ canal.adr|floatformat:2 }}</td>
+                  <td class="text-end fw-bold text-primary">${{ canal.revpar_aporte|floatformat:2 }}</td>
+                  <td class="text-end fw-bold">${{ canal.ingreso|floatformat:2 }}</td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="6" class="text-center text-muted">No hay reportes disponibles</td></tr>
@@ -579,38 +579,54 @@
       driverObj.drive();
     });
 
-    // 4. Hotkeys-js Check-in y Check-out Ultrarrápido sin ratón
-    hotkeys('i', function(event, handler) {
-      event.preventDefault();
-      Swal.fire({
-        title: '⚡ Check-in Ultrarrápido (Hotkey I)',
-        input: 'text',
-        inputLabel: 'Ingrese el número de habitación o ID de reserva:',
-        inputPlaceholder: 'Ej. 101 o Reserva #5',
-        showCancelButton: true,
-        confirmButtonText: 'Realizar Check-in'
-      }).then((result) => {
-        if (result.isConfirmed && result.value) {
-          Swal.fire('Check-in Exitoso', `Check-in procesado para: ${result.value}`, 'success');
-        }
-      });
-    });
+    // 4. Check-in y Check-out Ultrarrápido con Hotkeys [I] y [O]
+    document.addEventListener('keydown', function(event) {
+      // Ignorar si el usuario está escribiendo en un input, textarea o select
+      const activeEl = document.activeElement;
+      const tagName = activeEl ? activeEl.tagName : '';
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tagName) || (activeEl && activeEl.isContentEditable)) {
+        return;
+      }
 
-    hotkeys('o', function(event, handler) {
-      event.preventDefault();
-      Swal.fire({
-        title: '⚡ Check-out Ultrarrápido (Hotkey O)',
-        input: 'text',
-        inputLabel: 'Ingrese el número de habitación o ID de reserva:',
-        inputPlaceholder: 'Ej. 101 o Reserva #5',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Realizar Check-out'
-      }).then((result) => {
-        if (result.isConfirmed && result.value) {
-          Swal.fire('Check-out Exitoso', `Check-out procesado para: ${result.value}`, 'success');
-        }
-      });
+      // Ignorar si un modal SweetAlert2 ya está abierto
+      if (typeof Swal !== 'undefined' && Swal.isVisible && Swal.isVisible()) {
+        return;
+      }
+
+      const key = event.key ? event.key.toLowerCase() : '';
+
+      if (key === 'i') {
+        event.preventDefault();
+        Swal.fire({
+          title: '⚡ Check-in Ultrarrápido (Hotkey I)',
+          input: 'text',
+          inputLabel: 'Ingrese el número de habitación o ID de reserva:',
+          inputPlaceholder: 'Ej. 101 o Reserva #5',
+          showCancelButton: true,
+          confirmButtonText: 'Realizar Check-in',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed && result.value) {
+            Swal.fire('Check-in Exitoso', `Check-in procesado para: ${result.value}`, 'success');
+          }
+        });
+      } else if (key === 'o') {
+        event.preventDefault();
+        Swal.fire({
+          title: '⚡ Check-out Ultrarrápido (Hotkey O)',
+          input: 'text',
+          inputLabel: 'Ingrese el número de habitación o ID de reserva:',
+          inputPlaceholder: 'Ej. 101 o Reserva #5',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          confirmButtonText: 'Realizar Check-out',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed && result.value) {
+            Swal.fire('Check-out Exitoso', `Check-out procesado para: ${result.value}`, 'success');
+          }
+        });
+      }
     });
 
     // 5. Gráficos Chart.js de Canales, Ingresos y ADR

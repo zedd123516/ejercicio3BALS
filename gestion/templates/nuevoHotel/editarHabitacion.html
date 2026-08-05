@@ -8,7 +8,7 @@
                 <br>
                 <h1><b>Actualizar Habitación</b></h1>
                 <hr>
-                <form id="form_editar_habitacion" action="/procesar-actualizacion-habitacion/" method="post">
+                <form id="form_editar_habitacion" action="/procesar-actualizacion-habitacion/" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="hidden" name="id" value="{{ habitacion.id }}" readonly>
 
@@ -35,6 +35,14 @@
 
                     <b>Piso:</b> <br>
                     <input required placeholder="Ingrese el número de piso" class="form-control" type="number" name="piso" value="{{ habitacion.piso }}">
+                    <br>
+
+                    <b>Imagen de la habitación (solo imágenes):</b> <br>
+                    <input type="file" accept="image/*" class="form-control" name="imagen">
+                    {% if habitacion.imagen %}
+                        <p class="mt-2">Imagen actual: <a href="{{ habitacion.imagen.url }}" target="_blank">Ver imagen</a></p>
+                    {% endif %}
+                    <small class="text-muted">Si subes una nueva imagen, se reemplazará la anterior.</small>
                     <br>
 
                     <b>Estado:</b> <br>

@@ -110,9 +110,9 @@
                 <td class="fw-bold">{{ c.nombre }}</td>
                 <td class="text-center">{{ c.cantidad }}</td>
                 <td class="text-center">{{ c.porcentaje }}%</td>
-                <td class="text-end text-success fw-bold">${{ c.adr }}</td>
-                <td class="text-end text-primary fw-bold">${{ c.revpar_aporte }}</td>
-                <td class="text-end fw-bold">${{ c.ingreso }}</td>
+                <td class="text-end text-success fw-bold">${{ c.adr|floatformat:2 }}</td>
+                <td class="text-end text-primary fw-bold">${{ c.revpar_aporte|floatformat:2 }}</td>
+                <td class="text-end fw-bold">${{ c.ingreso|floatformat:2 }}</td>
             </tr>
             {% empty %}
             <tr>
@@ -132,8 +132,8 @@
                 <div>
                     <h6 class="fw-bold text-uppercase mb-1">{{ c.nombre }}</h6>
                     <p class="mb-0 small text-muted">Reservas: <strong>{{ c.cantidad }}</strong></p>
-                    <p class="mb-0 small text-muted">ADR: <strong>${{ c.adr }}</strong></p>
-                    <p class="mb-0 small text-primary">Ingreso: <strong>${{ c.ingreso }}</strong></p>
+                    <p class="mb-0 small text-muted">ADR: <strong>${{ c.adr|floatformat:2 }}</strong></p>
+                    <p class="mb-0 small text-primary">Ingreso: <strong>${{ c.ingreso|floatformat:2 }}</strong></p>
                 </div>
             </div>
             <script type="text/javascript">
