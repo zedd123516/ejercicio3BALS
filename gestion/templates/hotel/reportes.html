@@ -1,0 +1,308 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+<div class="container-fluid py-5">
+    <!-- Header principal de la página -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-graph-up-arrow text-primary me-2"></i>Dashboard de RevPAR, ADR y Reportes de Canales
+            </h2>
+            <p class="text-muted mb-0">Análisis detallado de indicadores hoteleros (RevPAR, ADR) y procedencia de reservas.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="/reporteCanalesPdf/" onclick="window.open(this.href,'Reporte Canales','width=900,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark shadow-sm me-2">
+                <i class="bi bi-printer-fill me-1"></i> Imprimir Reporte PDF
+            </a>
+            <a href="/reservas-hoteles/" class="btn btn-outline-secondary shadow-sm">
+                <i class="bi bi-arrow-left me-1"></i> Dashboard Admin
+            </a>
+        </div>
+    </div>
+
+    <!-- Módulo KPI Cards: RevPAR, ADR, Ocupación e Ingresos -->
+    <div class="row g-4 mb-5">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); text-color: white;">
+                <div class="card-body p-4 text-white">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-white-50 text-uppercase fw-semibold small">RevPAR (Rev / Available Room)</span>
+                        <div class="p-2 bg-white bg-opacity-25 rounded-circle">
+                            <i class="bi bi-cash-stack fs-4 text-white"></i>
+                        </div>
+                    </div>
+                    <h2 class="display-6 fw-bold mb-2">${{ revpar }}</h2>
+                    <span class="badge bg-white bg-opacity-25 text-white">
+                        <i class="bi bi-info-circle me-1"></i>Ingreso / {{ total_habitaciones }} Habitaciones
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #198754 0%, #146c43 100%);">
+                <div class="card-body p-4 text-white">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-white-50 text-uppercase fw-semibold small">ADR (Average Daily Rate)</span>
+                        <div class="p-2 bg-white bg-opacity-25 rounded-circle">
+                            <i class="bi bi-currency-dollar fs-4 text-white"></i>
+                        </div>
+                    </div>
+                    <h2 class="display-6 fw-bold mb-2">${{ adr }}</h2>
+                    <span class="badge bg-white bg-opacity-25 text-white">
+                        <i class="bi bi-graph-up me-1"></i>Tarifa Promedio Diaria
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 bg-white">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted text-uppercase fw-semibold small">Tasa de Ocupación</span>
+                        <div class="p-2 bg-primary bg-opacity-10 rounded-circle">
+                            <i class="bi bi-pie-chart-fill fs-4 text-primary"></i>
+                        </div>
+                    </div>
+                    <h2 class="display-6 fw-bold mb-2 text-dark">{{ ocupacion }}%</h2>
+                    <div class="progress mt-2" style="height: 6px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ ocupacion }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 bg-white">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted text-uppercase fw-semibold small">Ingresos Totales</span>
+                        <div class="p-2 bg-dark bg-opacity-10 rounded-circle">
+                            <i class="bi bi-wallet2 fs-4 text-dark"></i>
+                        </div>
+                    </div>
+                    <h2 class="display-6 fw-bold mb-2 text-dark">${{ total_ingresos }}</h2>
+                    <span class="text-muted small"><i class="bi bi-journal-check me-1"></i>{{ total_reservas }} Reservas Registradas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Gráficos Analíticos (Chart.js) -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-bar-chart-line-fill text-primary me-2"></i>Ingresos Totales vs ADR por Canal
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartReporteIngresos" style="min-height: 280px; max-height: 320px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-pie-chart-fill text-success me-2"></i>Participación por Canal (%)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartReporteDonut" style="min-height: 280px; max-height: 320px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla DataTables de Canales de Procedencia -->
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-dark mb-0">
+                <i class="bi bi-table me-2 text-primary"></i>Desglose de Reservas por Canal de Procedencia
+            </h5>
+            <span class="badge bg-light text-dark border">
+                <i class="bi bi-check-circle-fill text-success me-1"></i>Datos Actualizados
+            </span>
+        </div>
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table id="tbl_reporte_canales" class="table table-hover align-middle w-100">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Canal de Procedencia</th>
+                            <th class="text-center">Cantidad Reservas</th>
+                            <th class="text-center">% Participación</th>
+                            <th class="text-end">ADR Promedio ($)</th>
+                            <th class="text-end">Aporte RevPAR ($)</th>
+                            <th class="text-end">Ingreso Total ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for canal in canales %}
+                        <tr>
+                            <td class="fw-bold text-dark">
+                                {% if canal.canal_origen == 'directo' %}
+                                    <span class="badge bg-primary me-2"><i class="bi bi-person-check"></i></span>
+                                {% elif canal.canal_origen == 'booking' %}
+                                    <span class="badge bg-info me-2"><i class="bi bi-globe"></i></span>
+                                {% elif canal.canal_origen == 'agencia' %}
+                                    <span class="badge bg-warning text-dark me-2"><i class="bi bi-briefcase"></i></span>
+                                {% else %}
+                                    <span class="badge bg-secondary me-2"><i class="bi bi-building"></i></span>
+                                {% endif %}
+                                {{ canal.nombre }}
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark border px-3 py-2 fs-6">{{ canal.cantidad }}</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <span class="me-2 fw-bold text-primary">{{ canal.porcentaje }}%</span>
+                                    <div class="progress flex-grow-1" style="height: 8px; max-width: 90px;">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ canal.porcentaje }}%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end fw-bold text-success fs-6">${{ canal.adr }}</td>
+                            <td class="text-end fw-bold text-primary fs-6">${{ canal.revpar_aporte }}</td>
+                            <td class="text-end fw-bold text-dark fs-6">${{ canal.ingreso }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No hay reportes de canales disponibles.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Informativa: Fórmulas y Conceptos de RevPAR y ADR -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100 bg-light">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-info-circle-fill me-2"></i>¿Qué es el RevPAR (Revenue Per Available Room)?
+                    </h5>
+                    <p class="text-secondary small">
+                        El <strong>RevPAR</strong> mide los ingresos generados por cada habitación disponible en el hotel, independientemente de si está ocupada o no.
+                    </p>
+                    <div class="p-3 bg-white rounded border mb-3">
+                        <code class="fs-6 text-dark fw-bold">RevPAR = Ingresos Totales de Habitaciones / Total Habitaciones Disponibles</code>
+                        <div class="text-muted small mt-1">O alternativamente: <code>RevPAR = ADR × % Tasa de Ocupación</code></div>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        <strong>Interpretación:</strong> Un RevPAR elevado indica una excelente combinación entre altas tarifas por noche y óptimos niveles de ocupación.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100 bg-light">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-success mb-3">
+                        <i class="bi bi-calculator-fill me-2"></i>¿Qué es el ADR (Average Daily Rate)?
+                    </h5>
+                    <p class="text-secondary small">
+                        El <strong>ADR</strong> (Tarifa Promedio Diaria) representa el precio medio cobrado por cada habitación vendida u ocupada durante un periodo.
+                    </p>
+                    <div class="p-3 bg-white rounded border mb-3">
+                        <code class="fs-6 text-dark fw-bold">ADR = Ingresos Totales de Habitaciones / Habitaciones Ocupadas</code>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        <strong>Interpretación:</strong> Permite evaluar si el hotel está comercializando sus habitaciones al valor óptimo según la temporada y canal de venta.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // DataTables
+        new DataTable('#tbl_reporte_canales', {
+            language: {
+                search: "Buscar canal:",
+                lengthMenu: "Mostrar _MENU_ canales",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ canales",
+                zeroRecords: "No se encontraron canales de procedencia"
+            }
+        });
+
+        // Chart.js Bar Chart (Ingresos y ADR)
+        const ctxBar = document.getElementById('chartReporteIngresos');
+        if (ctxBar) {
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: {{ canales_labels_json|safe }},
+                    datasets: [
+                        {
+                            label: 'Ingreso Total ($)',
+                            data: {{ canales_ingresos_json|safe }},
+                            backgroundColor: 'rgba(13, 110, 253, 0.85)',
+                            borderColor: '#0d6efd',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Tarifa Promedio ADR ($)',
+                            data: {{ canales_adrs_json|safe }},
+                            backgroundColor: 'rgba(25, 135, 84, 0.85)',
+                            borderColor: '#198754',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Chart.js Donut Chart (Porcentaje de Reservas)
+        const ctxDonut = document.getElementById('chartReporteDonut');
+        if (ctxDonut) {
+            new Chart(ctxDonut, {
+                type: 'doughnut',
+                data: {
+                    labels: {{ canales_labels_json|safe }},
+                    datasets: [{
+                        data: {{ canales_cantidades_json|safe }},
+                        backgroundColor: [
+                            '#0d6efd',
+                            '#0dcaf0',
+                            '#ffc107',
+                            '#6c757d'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

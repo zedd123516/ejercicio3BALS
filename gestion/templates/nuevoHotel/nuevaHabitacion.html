@@ -1,0 +1,93 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <br>
+                <h1><b>Registrar Nueva Habitación</b></h1>
+                <hr>
+                <form id="form_nueva_habitacion" action="/guardar-habitacion/" method="post">
+                    {% csrf_token %}
+                    
+                    <b>Número de Habitación:</b> <br>
+                    <input required placeholder="Ingrese el número de habitación" class="form-control" type="text" name="numero">
+                    <br>
+                    
+                    <b>Tipo de Habitación:</b> <br>
+                    <select required class="form-control" name="tipo">
+                        <option value="">Seleccionar</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Deluxe">Deluxe</option>
+                        <option value="Suite">Suite</option>
+                        <option value="Junior">Junior</option>
+                    </select>
+                    <br>
+                    
+                    <b>Capacidad (personas):</b> <br>
+                    <input required placeholder="Ingrese la capacidad de personas" class="form-control" type="number" name="capacidad" value="2">
+                    <br>
+                    
+                    <b>Precio por Noche:</b> <br>
+                    <input required placeholder="Ingrese el precio por noche" class="form-control" type="number" step="0.01" name="precio_noche">
+                    <br>
+                    
+                    <b>Piso:</b> <br>
+                    <input required placeholder="Ingrese el número de piso" class="form-control" type="number" name="piso" value="1">
+                    <br>
+                    
+                    <b>Estado:</b> <br>
+                    <select class="form-control" name="estado">
+                        <option value="disponible">Disponible</option>
+                        <option value="ocupada">Ocupada</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                    </select>
+                    <br> <br>
+                    
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" type="submit"> 
+                            <i class="bi bi-check-circle"></i> Guardar
+                        </button>
+                        <a href="/habitaciones/" class="btn btn-danger"> 
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#form_nueva_habitacion").validate({
+            rules:{
+                numero:{ required:true },
+                tipo:{ required:true },
+                capacidad:{ min:1, max:20, number:true, required:true },
+                precio_noche:{ min:0, number:true, required:true },
+                piso:{ min:1, number:true, required:true }
+            },
+            messages:{
+                numero:{ required:"Por favor ingrese el número de habitación" },
+                tipo:{ required:"Por favor seleccione el tipo de habitación" },
+                capacidad:{
+                    required:"Por favor ingrese la capacidad",
+                    number: "Por favor introduzca números válidos",
+                    min:"Debe ingresar un valor mayor o igual a 1",
+                    max:"La capacidad no debe exceder 20"
+                },
+                precio_noche:{
+                    required:"Por favor ingrese el precio por noche",
+                    number: "Por favor introduzca un precio válido",
+                    min:"El precio debe ser un valor positivo"
+                },
+                piso:{
+                    required:"Por favor ingrese el piso",
+                    number: "Por favor introduzca números válidos",
+                    min:"Debe ingresar un número de piso válido"
+                }
+            }
+        });
+    </script>
+{% endblock %}

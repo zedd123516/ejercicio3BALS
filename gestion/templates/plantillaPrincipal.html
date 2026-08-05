@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <!--Etiqueta &mdash;  -->
+  <!--Para Una barra para extender y poner mas informacion-->
+  <title>Inmobiliaria &mdash; Gestión de Proyectos</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+
+  <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+  <!--Importando DATATABLES-->
+  <!--Componente CSS-->
+  <link rel="stylesheet" href="//cdn.datatables.net/2.3.8/css/dataTables.dataTables.min.css" >
+  <!-- Componente Script -->
+  <script src="//cdn.datatables.net/2.3.8/js/dataTables.min.js"></script>
+  <!-- Chart.js para dashboards y gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Importamos CDN de jQuery validation -->
+   <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+      <a href="/" class="logo d-flex align-items-center me-auto">
+        <h1 class="sitename" style="color:blue">HotelZ</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="/"></a></li>
+          {% if user.is_authenticated %}
+            {% if user.is_staff %}
+              <li><a href="/reservas-hoteles/">Dashboard Admin</a></li>
+              <li><a href="/habitaciones/">Habitaciones</a></li>
+              <li><a href="/huespedes/">Huéspedes</a></li>
+              <li><a href="/reservas/">Reservas</a></li>
+              <li><a href="/servicios/">Servicios Extra</a></li>
+              <li><a href="/amas/">Amas de Llaves</a></li>
+              <li><a href="/facturas/">Facturas</a></li>
+              <li><a href="/clientes/">Clientes</a></li>
+              <li><a href="/reportes/">Reportes</a></li>
+            {% else %}
+              <li><a href="/reservar-cliente/">Hacer Reserva</a></li>
+              <li><a href="/mis-reservas/">Mis Reservas</a></li>
+            {% endif %}
+            <li><a href="/logout/" class="btn btn-outline-danger btn-sm text-white ms-2 px-3">Cerrar Sesión ({{ user.username }})</a></li>
+          {% else %}
+            <li><a href="/login/" class="btn btn-primary btn-sm text-white ms-2 px-3">Iniciar Sesión</a></li>
+            <li><a href="/registro/" class="btn btn-outline-primary btn-sm text-dark ms-2 px-3">Registrarse</a></li>
+          {% endif %}
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="main">
+    {% block contenido %}
+    {% endblock %}
+  </main>
+
+  <footer id="footer" class="footer position-relative light-background">
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">Mentor</strong> <span>All Rights Reserved</span></p>
+      <div class="credits">
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a> Distributed by <a href="https://themewagon.com">ThemeWagon</a>
+      </div>
+    </div>
+  </footer>
+
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <div id="preloader"></div>
+
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <script src="{% static 'assets/js/main.js' %}"></script>
+  <!--Importando Sweet Alert-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!--Agreagar con JINJA para el mensaje de respuesta-->
+  {% if messages %}
+    {% for mensaje in messages %}
+        <script> 
+            Swal.fire({
+                title: "{% if 'error' in mensaje.tags %}¡Atención! Datos Duplicados / Error{% elif 'warning' in mensaje.tags %}Advertencia{% elif 'info' in mensaje.tags %}Información{% else %}Confirmación{% endif %}",
+                text: "{{ mensaje|escapejs }}",
+                icon: "{% if 'error' in mensaje.tags %}error{% elif 'warning' in mensaje.tags %}warning{% elif 'info' in mensaje.tags %}info{% else %}success{% endif %}",
+                confirmButtonColor: "{% if 'error' in mensaje.tags %}#d33{% else %}#3085d6{% endif %}"
+            });   
+        </script>
+    {% endfor %}
+  {% endif %}
+
+  <script>
+    function confirmacion(event, urlEliminar){
+       event.preventDefault(); 
+       Swal.fire({
+          title: "¿Estás seguro de eliminar este registro?",
+          text: "No habrá un retorno",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sí, Estoy De Acuerdo",
+          cancelButtonText: "Cancelar"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Si el usuario confirma, se redirige a la ruta de Django
+            window.location.href = urlEliminar;
+          }
+        });
+    }
+  </script>
+
+  <style>
+    label.error{
+      color:red;
+    }
+    input.error{
+      border: 1px solid red;
+    }
+  </style>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <center>
+        <br>
+        <h1><b>Clientes Registrados</b>            
+            <!-- target="_blank" -->
+            <a href="/reporteClientes/" onclick="window.open(this.href,'Reporte Clientes','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark">
+                <i class="bi bi-eye"></i>
+                Imprimir Reporte
+            </a>        
+        </h1>
+        <hr>
+    </center>
+    <br>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <table id="tbl_clientes" class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Nombre Completo</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Documento</th>
+                        <th>Nacionalidad</th>
+                        <th>Fecha Registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr>
+                        <td>{{ cliente.id }}</td>
+                        <td><span class="badge bg-info text-dark">{{ cliente.usuario.username }}</span></td>
+                        <td>{{ cliente.usuario.get_full_name|default:cliente.usuario.username }}</td>
+                        <td>{{ cliente.usuario.email|default:"-" }}</td>
+                        <td>{{ cliente.telefono|default:"-" }}</td>
+                        <td>{{ cliente.documento|default:"-" }}</td>
+                        <td>{{ cliente.nacionalidad }}</td>
+                        <td>{{ cliente.fecha_registro|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <a href="/editar-cliente/{{ cliente.id }}/" class="btn btn-outline-warning btn-sm" title="Editar Cliente">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="#" onclick="confirmacion(event, '/eliminar-cliente/{{ cliente.id }}/')" class="btn btn-outline-danger btn-sm" title="Eliminar Cliente">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-3">No hay clientes registrados en la plataforma</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let table = new DataTable('#tbl_clientes');
+    </script>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <br>
+                <h1><b>Registrar Nuevo Servicio Extra</b></h1>
+                <hr>
+                <form id="form_nuevo_servicio" action="/guardar-servicio/" method="post">
+                    <!--Metodo de token para peticiones autorizadas-->
+                    {% csrf_token %}
+                    
+                    <b>Nombre del Servicio:</b> <br>
+                    <input required placeholder="Ingrese el nombre del servicio" class="form-control" type="text" name="nombre">
+                    <br>
+
+                    <b>Descripción:</b> <br>
+                    <textarea placeholder="Ingrese una descripción del servicio" class="form-control" name="descripcion" rows="3"></textarea>
+                    <br>
+
+                    <b>Precio:</b> <br>
+                    <input required placeholder="Ingrese el precio" class="form-control" type="number" step="0.01" name="precio">
+                    <br> <br>
+
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" type="submit"> 
+                            <i class="bi bi-check-circle"></i> Guardar
+                        </button>
+                        <a href="/servicios/" class="btn btn-danger"> 
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#form_nuevo_servicio").validate({
+            rules:{
+                nombre:{
+                    required: true,
+                    minlength: 3
+                },
+                precio:{
+                    required: true,
+                    min: 0,
+                    number: true
+                }
+            },
+            messages:{
+                nombre:{
+                    required: "Por favor ingrese el nombre del servicio",
+                    minlength: "Debe ingresar al menos 3 caracteres"
+                },
+                precio:{
+                    required: "Por favor ingrese el precio del servicio",
+                    min: "El precio debe ser un valor mayor o igual a 0",
+                    number: "Por favor ingrese un número válido"
+                }
+            }
+        });
+    </script>
+{% endblock %}

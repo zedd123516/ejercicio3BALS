@@ -1,0 +1,58 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <center>
+        <br>
+        <h1><b>Facturas Registradas</b>            
+            <!-- target="_blank" -->
+            <a href="/reporteFacturas/" onclick="window.open(this.href,'Reporte Facturas','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark">
+                <i class="bi bi-eye"></i>
+                Imprimir Reporte
+            </a>        
+        </h1>
+        <hr>
+    </center>
+    <br>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <table id="tbl_facturas" class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Método Pago</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for factura in facturas %}
+                    <tr>
+                        <td>{{ factura.numero_factura }}</td>
+                        <td>${{ factura.total }}</td>
+                        <td><span class="badge bg-warning text-dark">{{ factura.estado }}</span></td>
+                        <td>{{ factura.metodo_pago }}</td>
+                        <td>{{ factura.fecha_emision }}</td>
+                        <td>
+                            <a href="/editar-factura/{{ factura.id }}/" class="btn btn-outline-warning btn-sm" title="Editar Factura">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="#" onclick="confirmacion(event, '/eliminar-factura/{{ factura.id }}/')" class="btn btn-outline-danger btn-sm" title="Eliminar Factura">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted">No hay facturas registradas</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let table = new DataTable('#tbl_facturas');
+    </script>
+{% endblock %}

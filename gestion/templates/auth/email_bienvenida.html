@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>¡Bienvenido a HotelZ!</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        .email-header {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+        }
+        .email-body {
+            padding: 30px;
+            color: #333333;
+            line-height: 1.6;
+        }
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .info-box p {
+            margin: 5px 0;
+        }
+        .btn-login {
+            display: inline-block;
+            background-color: #198754;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .email-footer {
+            background-color: #f1f3f5;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>¡Bienvenido a HotelZ! 🏨</h1>
+        </div>
+        <div class="email-body">
+            <h2>Hola, {{ nombre }} 👋</h2>
+            <p>¡Gracias por registrarte en nuestra plataforma de gestión y reservas hoteleras! Tu cuenta ha sido creada exitosamente.</p>
+            
+            <div class="info-box">
+                <p><strong>Detalles de tu cuenta:</strong></p>
+                <p>👤 <strong>Nombre:</strong> {{ nombre }} {{ apellido }}</p>
+                <p>🔑 <strong>Usuario:</strong> {{ username }}</p>
+                <p>✉️ <strong>Email registrado:</strong> {{ email }}</p>
+            </div>
+
+            <p>Ya puedes acceder a nuestra plataforma para realizar y consultar tus reservas de habitaciones en cualquier momento.</p>
+
+            <div style="text-align: center;">
+                <a href="{{ domain }}/login/" class="btn-login">Iniciar Sesión Ahora</a>
+            </div>
+        </div>
+        <div class="email-footer">
+            <p>© 2026 HotelZ - Sistema de Gestión Hotelera. Todos los derechos reservados.</p>
+            <p>Por favor no respondas a este correo generado automáticamente.</p>
+        </div>
+    </div>
+</body>
+</html>

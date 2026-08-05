@@ -1,0 +1,107 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <br>
+                <h1><b>Actualizar Huésped</b></h1>
+                <hr>
+                <form id="form_editar_huesped" action="/procesar-actualizacion-huesped/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ huesped.id }}" readonly>
+
+                    <b>Nombres:</b> <br>
+                    <input required placeholder="Ingrese los nombres" class="form-control" type="text" name="nombres" value="{{ huesped.nombres }}">
+                    <br>
+
+                    <b>Apellidos:</b> <br>
+                    <input required placeholder="Ingrese los apellidos" class="form-control" type="text" name="apellidos" value="{{ huesped.apellidos }}">
+                    <br>
+
+                    <b>Documento (Cédula/Pasaporte):</b> <br>
+                    <input required placeholder="Ingrese el documento" class="form-control" type="text" name="documento" value="{{ huesped.documento }}">
+                    <br>
+
+                    <b>Email:</b> <br>
+                    <input required placeholder="Ingrese el correo electrónico" class="form-control" type="email" name="email" value="{{ huesped.email }}">
+                    <br>
+
+                    <b>Teléfono:</b> <br>
+                    <input required placeholder="Ingrese el teléfono" class="form-control" type="text" name="telefono" value="{{ huesped.telefono }}">
+                    <br>
+
+                    <b>Nacionalidad:</b> <br>
+                    <input required placeholder="Ingrese la nacionalidad" class="form-control" type="text" name="nacionalidad" value="{{ huesped.nacionalidad }}">
+                    <br> <br>
+
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" type="submit">
+                            <i class="bi bi-check-circle"></i> Actualizar
+                        </button>
+                        <a href="/huespedes/" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#form_editar_huesped").validate({
+            rules:{
+                nombres:{
+                    required: true,
+                    minlength: 3
+                },
+                apellidos:{
+                    required: true,
+                    minlength: 3
+                },
+                documento:{
+                    required: true,
+                    minlength: 5
+                },
+                email:{
+                    required: true,
+                    email: true
+                },
+                telefono:{
+                    required: true,
+                    minlength: 7
+                },
+                nacionalidad:{
+                    required: true
+                }
+            },
+            messages:{
+                nombres:{
+                    required: "Por favor ingrese los nombres",
+                    minlength: "Debe ingresar al menos 3 caracteres"
+                },
+                apellidos:{
+                    required: "Por favor ingrese los apellidos",
+                    minlength: "Debe ingresar al menos 3 caracteres"
+                },
+                documento:{
+                    required: "Por favor ingrese el número de documento",
+                    minlength: "Ingrese un documento válido"
+                },
+                email:{
+                    required: "Por favor ingrese el correo electrónico",
+                    email: "Por favor ingrese un correo electrónico válido"
+                },
+                telefono:{
+                    required: "Por favor ingrese el número de teléfono",
+                    minlength: "Ingrese un teléfono válido"
+                },
+                nacionalidad:{
+                    required: "Por favor ingrese la nacionalidad"
+                }
+            }
+        });
+    </script>
+{% endblock %}

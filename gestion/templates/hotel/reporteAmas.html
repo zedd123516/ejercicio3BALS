@@ -1,0 +1,100 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+<script 
+src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<br>
+
+<center> 
+    <table> 
+        <tr> 
+            <td style="text-align: left; width: 800px;">
+                <img src="{% static 'assets/img/hotelz.jpg' %}" alt="Logo UTC">
+            </td> 
+            <td style="text-align: right; width: 800px;">
+                <img src="{% static 'assets/img/logo1.jpg' %}">
+            </td> 
+        </tr> 
+    </table> 
+
+    <h1>PERSONAL DE AMAS DE LLAVES</h1> 
+</center> 
+<br>
+
+{% for a in amas %} 
+    <center> 
+        <div>       
+
+            <div style="width:200px; float:left; padding-left:20px !important;"> 
+                <div id="qrcode{{ a.id }}"></div> 
+                <script type="text/javascript"> 
+                    var texto = "AMA DE LLAVES: {{ a.nombre|escapejs }} \n TURNO: {{ a.turno|escapejs }} \n PISO: {{ a.piso_asignado }} \n TELEFONO: {{ a.telefono|default:'No registrado'|escapejs }}"; 
+                    
+                    new QRCode(document.getElementById("qrcode{{ a.id }}"), { 
+                        text: texto, 
+                        width: 128, 
+                        height: 128, 
+                        colorDark : "#000", 
+                        colorLight : "#ffffff"
+                    }); 
+                </script> 
+            </div> 
+
+            <div style="width:50%; padding-left:20px;"> 
+                <hr> 
+                <h5 style="text-transform: uppercase;"><b>AMA DE LLAVES #00{{ a.id }} - {{ a.nombre }}</b></h5> 
+                <hr> 
+                <h5 style="text-transform: uppercase;"><b>TURNO DE TRABAJO: {{ a.turno }}</b></h5> 
+                <hr> 
+                <h5><b>PISO ASIGNADO: </b> Piso {{ a.piso_asignado }}</h5> 
+                <hr> 
+                <h5><b>TELÉFONO DE CONTACTO: </b> {{ a.telefono|default:"No registrado" }}</h5> 
+            </div> 
+        </div> 
+    </center> 
+    <br>  
+{% endfor %} 
+
+<center> 
+    <br><br> 
+    ......................................... <br> 
+    <b>FIRMA DE RESPONSABILIDAD</b> <br> 
+    <b>C.I.:___________________</b> <br> 
+    <b>GERENTE DE RECEPCIÓN / HOTEL</b> 
+</center> 
+
+<center> 
+    <br> 
+    <button onclick="window.print();">Imprimir Reporte</button> 
+</center> 
+<br> 
+
+<style media="print"> 
+    button { 
+        display: none; 
+    } 
+    @page { 
+        /* size: landscape; */ 
+    } 
+</style> 
+
+<script> 
+    // Función para auto-imprimir pantalla al abrir
+    window.print(); 
+</script> 
+
+<script type="text/javascript"> 
+    var urlActual = window.location.href; 
+     
+    new QRCode(document.getElementById("qrcode"), { 
+        text: urlActual, 
+        width: 128, 
+        height: 128, 
+        colorDark : "#00f", 
+        colorLight : "#ffffff", 
+        correctLevel : QRCode.CorrectLevel.H 
+    }); 
+</script>

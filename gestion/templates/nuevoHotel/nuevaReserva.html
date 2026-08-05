@@ -1,0 +1,128 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <br>
+                <h1><b>Registrar Nueva Reserva</b></h1>
+                <hr>
+                <form id="form_nueva_reserva" action="/guardar-reserva/" method="post">
+                    <!--Metodo de token para peticiones autorizadas-->
+                    {% csrf_token %}
+                    
+                    <b>Huésped:</b> <br>
+                    <select required class="form-control" name="huesped">
+                        <option value="">Seleccionar</option>
+                        {% for huesped in huespedes %}
+                        <option value="{{ huesped.id }}">{{ huesped.nombres }} {{ huesped.apellidos }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+
+                    <b>Habitación:</b> <br>
+                    <select required class="form-control" name="habitacion">
+                        <option value="">Seleccionar</option>
+                        {% for habitacion in habitaciones %}
+                        <option value="{{ habitacion.id }}">{{ habitacion.numero }} - {{ habitacion.tipo }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+
+                    <b>Fecha Entrada:</b> <br>
+                    <input required class="form-control" type="date" name="fecha_entrada">
+                    <br>
+
+                    <b>Fecha Salida:</b> <br>
+                    <input required class="form-control" type="date" name="fecha_salida">
+                    <br>
+
+                    <b>Número de Huéspedes:</b> <br>
+                    <input required placeholder="Ingrese la cantidad de personas" class="form-control" type="number" name="numero_huespedes" value="1">
+                    <br>
+
+                    <b>Canal Origen:</b> <br>
+                    <select class="form-control" name="canal_origen">
+                        <option value="directo">Directo</option>
+                        <option value="booking">Booking</option>
+                        <option value="agencia">Agencia</option>
+                        <option value="corporativo">Corporativo</option>
+                    </select>
+                    <br>
+
+                    <b>Tarifa Base:</b> <br>
+                    <input required placeholder="Ingrese la tarifa base" class="form-control" type="number" step="0.01" name="tarifa_base">
+                    <br>
+
+                    <b>Notas:</b> <br>
+                    <textarea placeholder="Ingrese alguna observación o nota" class="form-control" name="notas" rows="3"></textarea>
+                    <br> <br>
+
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" type="submit"> 
+                            <i class="bi bi-check-circle"></i> Guardar
+                        </button>
+                        <a href="/reservas/" class="btn btn-danger"> 
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#form_nueva_reserva").validate({
+            rules:{
+                huesped:{
+                    required: true
+                },
+                habitacion:{
+                    required: true
+                },
+                fecha_entrada:{
+                    required: true
+                },
+                fecha_salida:{
+                    required: true
+                },
+                numero_huespedes:{
+                    required: true,
+                    min: 1,
+                    number: true
+                },
+                tarifa_base:{
+                    required: true,
+                    min: 0,
+                    number: true
+                }
+            },
+            messages:{
+                huesped:{
+                    required: "Por favor seleccione un huésped"
+                },
+                habitacion:{
+                    required: "Por favor seleccione una habitación"
+                },
+                fecha_entrada:{
+                    required: "Por favor ingrese la fecha de entrada"
+                },
+                fecha_salida:{
+                    required: "Por favor ingrese la fecha de salida"
+                },
+                numero_huespedes:{
+                    required: "Por favor ingrese el número de huéspedes",
+                    min: "Debe ser al menos 1 huésped",
+                    number: "Por favor ingrese un número válido"
+                },
+                tarifa_base:{
+                    required: "Por favor ingrese la tarifa base",
+                    min: "El valor debe ser positivo",
+                    number: "Por favor ingrese un valor válido"
+                }
+            }
+        });
+    </script>
+{% endblock %}

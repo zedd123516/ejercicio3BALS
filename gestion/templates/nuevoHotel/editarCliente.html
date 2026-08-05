@@ -1,0 +1,120 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <br>
+                <h1><b>Actualizar Cliente</b></h1>
+                <hr>
+                <form id="form_editar_cliente" action="/procesar-actualizacion-cliente/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ cliente.id }}" readonly>
+
+                    <b>Nombres:</b> <br>
+                    <input required placeholder="Ingrese los nombres" class="form-control" type="text" name="nombres" value="{{ cliente.usuario.first_name }}">
+                    <br>
+
+                    <b>Apellidos:</b> <br>
+                    <input required placeholder="Ingrese los apellidos" class="form-control" type="text" name="apellidos" value="{{ cliente.usuario.last_name }}">
+                    <br>
+
+                    <b>Nombre de Usuario:</b> <br>
+                    <input required placeholder="Ingrese el nombre de usuario" class="form-control" type="text" name="username" value="{{ cliente.usuario.username }}">
+                    <br>
+
+                    <b>Correo Electrónico:</b> <br>
+                    <input required placeholder="Ingrese el correo electrónico" class="form-control" type="email" name="email" value="{{ cliente.usuario.email }}">
+                    <br>
+
+                    <b>Documento (Cédula / Pasaporte):</b> <br>
+                    <input required placeholder="Ingrese el número de documento" class="form-control" type="text" name="documento" value="{{ cliente.documento|default:'' }}">
+                    <br>
+
+                    <b>Teléfono:</b> <br>
+                    <input placeholder="Ingrese el teléfono de contacto" class="form-control" type="text" name="telefono" value="{{ cliente.telefono|default:'' }}">
+                    <br>
+
+                    <b>Nacionalidad:</b> <br>
+                    <input required placeholder="Ingrese la nacionalidad" class="form-control" type="text" name="nacionalidad" value="{{ cliente.nacionalidad }}">
+                    <br> <br>
+
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" type="submit">
+                            <i class="bi bi-check-circle"></i> Actualizar
+                        </button>
+                        <a href="/clientes/" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#form_editar_cliente").validate({
+            rules: {
+                nombres: {
+                    required: true,
+                    minlength: 2
+                },
+                apellidos: {
+                    required: true,
+                    minlength: 2
+                },
+                username: {
+                    required: true,
+                    minlength: 3
+                },
+                email: {
+                    required: true,
+                    email: true
+                },
+                documento: {
+                    required: true,
+                    minlength: 5
+                },
+                telefono: {
+                    required: false,
+                    digits: true,
+                    minlength: 7
+                },
+                nacionalidad: {
+                    required: true
+                }
+            },
+            messages: {
+                nombres: {
+                    required: "Por favor ingrese los nombres",
+                    minlength: "Debe ingresar al menos 2 caracteres"
+                },
+                apellidos: {
+                    required: "Por favor ingrese los apellidos",
+                    minlength: "Debe ingresar al menos 2 caracteres"
+                },
+                username: {
+                    required: "Por favor ingrese el nombre de usuario",
+                    minlength: "El usuario debe tener al menos 3 caracteres"
+                },
+                email: {
+                    required: "Por favor ingrese el correo electrónico",
+                    email: "Por favor ingrese una dirección de correo válida"
+                },
+                documento: {
+                    required: "Por favor ingrese el número de documento",
+                    minlength: "El documento debe tener al menos 5 caracteres"
+                },
+                telefono: {
+                    digits: "Ingrese únicamente números para el teléfono",
+                    minlength: "El teléfono debe tener al menos 7 dígitos"
+                },
+                nacionalidad: {
+                    required: "Por favor ingrese la nacionalidad"
+                }
+            }
+        });
+    </script>
+{% endblock %}

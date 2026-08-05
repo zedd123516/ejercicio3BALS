@@ -1,0 +1,104 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+<script 
+src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<br>
+
+<center> 
+    <table> 
+        <tr> 
+            <td style="text-align: left; width: 800px;">
+                <img src="{% static 'assets/img/hotelz.jpg' %}" alt="Logo UTC">
+            </td> 
+            <td style="text-align: right; width: 800px;">
+                <img src="{% static 'assets/img/logo1.jpg' %}">
+            </td> 
+        </tr> 
+    </table> 
+
+    <h1>REPORTE DE MIS RESERVAS</h1> 
+</center> 
+<br> 
+
+{% for r in reservas %} 
+    <center> 
+        <div>       
+
+            <div style="width:200px; float:left; padding-left:20px !important;"> 
+                <div id="qrcode{{ r.id }}"></div> 
+                <script type="text/javascript"> 
+                    var texto = "RESERVA NRO: {{ r.id }} \n HABITACION: {{ r.habitacion.numero|escapejs }} \n ENTRADA: {{ r.fecha_entrada|date:'Y-m-d' }} \n SALIDA: {{ r.fecha_salida|date:'Y-m-d' }} \n ESTADO: {{ r.estado|escapejs }} \n TARIFA: ${{ r.tarifa_base }}"; 
+                    
+                    new QRCode(document.getElementById("qrcode{{ r.id }}"), { 
+                        text: texto, 
+                        width: 128, 
+                        height: 128, 
+                        colorDark : "#000", 
+                        colorLight : "#ffffff"
+                    }); 
+                </script> 
+            </div> 
+
+            <div style="width:50%; padding-left:20px;"> 
+                <hr> 
+                <h5 style="text-transform: uppercase;"><b>RESERVA #00{{ r.id }} - HABITACIÓN {{ r.habitacion.numero }} ({{ r.habitacion.tipo }})</b></h5> 
+                <hr> 
+                <h5><b>FECHA ENTRADA: </b> {{ r.fecha_entrada }} | <b>FECHA SALIDA: </b> {{ r.fecha_salida }}</h5> 
+                <hr> 
+                <h5><b>HUÉSPEDES: </b> {{ r.numero_huespedes }} personas</h5> 
+                <hr> 
+                <h5><b>ESTADO DE RESERVA: </b> {{ r.estado|upper }}</h5> 
+                <hr> 
+                <h5><b>TARIFA BASE: </b> ${{ r.tarifa_base }}</h5> 
+            </div> 
+        </div> 
+    </center> 
+    <br>  
+{% empty %}
+    <center><h3>No tienes reservas registradas.</h3></center>
+{% endfor %} 
+
+<center> 
+    <br><br> 
+    ......................................... <br> 
+    <b>FIRMA DEL CLIENTE / TITULAR</b> <br> 
+    <b>C.I.:___________________</b> <br> 
+    <b>SISTEMA DE RESERVAS HOTEL</b> 
+</center> 
+
+<center> 
+    <br> 
+    <button onclick="window.print();">Imprimir Reporte</button> 
+</center> 
+<br> 
+
+<style media="print"> 
+    button { 
+        display: none; 
+    } 
+    @page { 
+        /* size: landscape; */ 
+    } 
+</style> 
+
+<script> 
+    // Función para auto-imprimir pantalla al abrir
+    window.print(); 
+</script> 
+
+<script type="text/javascript"> 
+    var urlActual = window.location.href; 
+     
+    new QRCode(document.getElementById("qrcode"), { 
+        text: urlActual, 
+        width: 128, 
+        height: 128, 
+        colorDark : "#00f", 
+        colorLight : "#ffffff", 
+        correctLevel : QRCode.CorrectLevel.H 
+    }); 
+</script>

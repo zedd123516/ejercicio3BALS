@@ -1,0 +1,64 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <center>
+        <br>
+        <h1><b>Reservas Registradas</b>            
+            <a href="/nueva-reserva/" class="btn btn-info text-white"> 
+                <i class="bi bi-plus-circle"></i>
+                Nueva Reserva
+            </a>
+            <!-- target="_blank" -->
+            <a href="/reporteReservas/" onclick="window.open(this.href,'Reporte Reservas','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark">
+                <i class="bi bi-eye"></i>
+                Imprimir Reporte
+            </a>        
+        </h1>
+        <hr>
+    </center>
+    <br>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <table id="tbl_reservas" class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Huésped</th>
+                        <th>Habitación</th>
+                        <th>Entrada</th>
+                        <th>Salida</th>
+                        <th>Estado</th>
+                        <th>Canal</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas %}
+                    <tr>
+                        <td>{{ reserva.huesped.nombres }} {{ reserva.huesped.apellidos }}</td>
+                        <td>{{ reserva.habitacion.numero }}</td>
+                        <td>{{ reserva.fecha_entrada }}</td>
+                        <td>{{ reserva.fecha_salida }}</td>
+                        <td><span class="badge bg-info text-dark">{{ reserva.estado }}</span></td>
+                        <td>{{ reserva.canal_origen|title }}</td>
+                        <td>
+                            <a href="/editar-reserva/{{ reserva.id }}/" class="btn btn-outline-warning btn-sm" title="Editar Reserva">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="#" onclick="confirmacion(event, '/eliminar-reserva/{{ reserva.id }}/')" class="btn btn-outline-danger btn-sm" title="Eliminar Reserva">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted">No hay reservas registradas</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let table = new DataTable('#tbl_reservas');
+    </script>
+{% endblock %}

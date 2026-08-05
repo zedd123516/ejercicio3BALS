@@ -1,0 +1,63 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <center>
+        <br>
+        <h1><b>Habitaciones Registradas</b>            
+            <a href="/nueva-habitacion/" class="btn btn-info text-white"> 
+                <i class="bi bi-plus-circle"></i>
+                Nueva Habitación
+            </a>
+            <a href="/reporteHabitaciones/" onclick="window.open(this.href,'Reporte Habitaciones','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark">
+                <i class="bi bi-eye"></i>
+                Imprimir Reporte
+            </a>        
+        </h1>
+        <hr>
+    </center>
+    <br>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <table id="tbl_habitaciones" class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Tipo</th>
+                        <th>Capacidad</th>
+                        <th>Precio</th>
+                        <th>Piso</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for habitacion in habitaciones %}
+                    <tr>
+                        <td>{{ habitacion.numero }}</td>
+                        <td>{{ habitacion.tipo }}</td>
+                        <td>{{ habitacion.capacidad }}</td>
+                        <td>${{ habitacion.precio_noche }}</td>
+                        <td>{{ habitacion.piso }}</td>
+                        <td><span class="badge bg-success">{{ habitacion.estado }}</span></td>
+                        <td>
+                            <a href="/editar-habitacion/{{ habitacion.id }}/" class="btn btn-outline-warning btn-sm" title="Editar Habitación">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="#" onclick="confirmacion(event, '/eliminar-habitacion/{{ habitacion.id }}/')" class="btn btn-outline-danger btn-sm" title="Eliminar Habitación">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted">No hay habitaciones registradas</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let table = new DataTable('#tbl_habitaciones');
+    </script>
+{% endblock %}3

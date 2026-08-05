@@ -1,0 +1,305 @@
+{% extends "./plantillaPrincipal.html" %}
+{% load static %}
+{% block contenido %}
+
+    <section id="hero" class="hero section dark-background">
+      <img src="{% static 'assets/img/principal.jpg' %}" alt="" data-aos="fade-in">
+      <div class="container">
+        <h2 data-aos="fade-up" data-aos-delay="100">Explorar Hoy,<br>Descansar mañana</h2>
+        <p data-aos="fade-up" data-aos-delay="200">Somos tu plataforma de reserva de hoteles</p>
+        <div class="d-flex mt-4" data-aos="fade-up" data-aos-delay="300">
+          <a href="#" class="btn-get-started">Comience</a>
+        </div>
+      </div>
+    </section>
+    <section id="about" class="about section">
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-up" data-aos-delay="100">
+            <img src="{% static 'assets/img/secundario.jpg' %}" class="img-fluid" alt="">
+          </div>
+
+          <div class="col-lg-6 order-2 order-lg-1 content" data-aos="fade-up" data-aos-delay="200">
+            <h3>Enfoque en Confianza y Seguridad</h3>
+            <p class="fst-italic">
+              Gestión de reservas hoteleras transparente y a tu medida
+            </p>
+            <ul>
+              <li><i class="bi bi-check-circle"></i> <span>Tu descanso es lo primero. Te conectamos con hoteles verificados y confirmación al instante.</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>Soporte y atención completa sin costos ocultos.</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>Filtrado y verificación de hoteles para garantizar tu tranquilidad y seguridad.</span></li>
+            </ul>
+            <a href="#" class="read-more" style="background-color: #0d6efd; border-color: #0d6efd; color: white;"><span>Leer más</span><i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COUNTS SECTION -->
+    <section id="counts" class="section counts light-background">
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row gy-4">
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="1232" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Viajeros Felices</p>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="64" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Destinos Top</p>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="42" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Hoteles Aliados</p>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="24" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Soporte Directo</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="why-us" class="section why-us">
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="why-box">
+              <h3>¿Por qué reservar con nosotros?</h3>
+              <p>
+                Planificar tus vacaciones o viajes de trabajo no debería ser estresante. Te ofrecemos una selección exclusiva de alojamientos garantizados, las mejores tarifas del mercado y un proceso de reserva sencillo para que solo te preocupes por disfrutar.
+              </p>
+              <div class="text-center">
+                <a href="#" class="more-btn"><span>Descubrir más</span> <i class="bi bi-chevron-right"></i></a>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-8 d-flex align-items-stretch">
+            <div class="row gy-4" data-aos="fade-up" data-aos-delay="200">
+              <div class="col-xl-4">
+                <div class="icon-box d-flex flex-column justify-content-center align-items-center">
+                  <i class="bi bi-clipboard-data"></i>
+                  <h4>Reservas Garatizadas</h4>
+                  <p>Disfruta de la tranquilidad de reservar con tarifas transparentes y opciones de cancelación adaptadas a tu viaje.</p>
+                </div>
+              </div>
+              <div class="col-xl-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="icon-box d-flex flex-column justify-content-center align-items-center">
+                  <i class="bi bi-gem"></i>
+                  <h4>Confirmación Inmediata al Instante</h4>
+                  <p>Olvídate de las esperas. Recibe tu comprobante y detalles del alojamiento en tu correo de forma automática.</p>
+                </div>
+              </div>
+              <div class="col-xl-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="icon-box d-flex flex-column justify-content-center align-items-center">
+                  <i class="bi bi-inboxes"></i>
+                  <h4>Soporte Personalizado 24/7</h4>
+                  <p>Te acompañamos antes, durante y después de tu estancia para resolver cualquier imprevisto de inmediato.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="features" class="features section">
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="features-item">
+              <i class="bi bi-eye" style="color: #ffbb2c;"></i>
+              <h3><a href="" class="stretched-link">Hoteles con Vistas Increíbles</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="features-item">
+              <i class="bi bi-infinity" style="color: #5578ff;"></i>
+              <h3><a href="" class="stretched-link">Estancias Sin Límites / Todo Incluido</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="features-item">
+              <i class="bi bi-mortarboard" style="color: #e80368;"></i>
+              <h3><a href="" class="stretched-link">Hoteles Universitarios & Escapadas</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="400">
+            <div class="features-item">
+              <i class="bi bi-nut" style="color: #e361ff;"></i>
+              <h3><a href="" class="stretched-link">Hoteles Económicos & Funcionales</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="500">
+            <div class="features-item">
+              <i class="bi bi-shuffle" style="color: #47aeff;"></i>
+              <h3><a href="" class="stretched-link">Estancias Flexibles / Larga Duración</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="600">
+            <div class="features-item">
+              <i class="bi bi-star" style="color: #ffa76e;"></i>
+              <h3><a href="" class="stretched-link">Hoteles Destacados / Favoritos</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="700">
+            <div class="features-item">
+              <i class="bi bi-x-diamond" style="color: #11dbcf;"></i>
+              <h3><a href="" class="stretched-link">Hoteles Exclusivos / Boutique</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="800">
+            <div class="features-item">
+              <i class="bi bi-camera-video" style="color: #4233ff;"></i>
+              <h3><a href="" class="stretched-link">Hoteles Turísticos & Recorridos</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="900">
+            <div class="features-item">
+              <i class="bi bi-command" style="color: #b2904f;"></i>
+              <h3><a href="" class="stretched-link">Hoteles Pet Friendly</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="1000">
+            <div class="features-item">
+              <i class="bi bi-dribbble" style="color: #b20969;"></i>
+              <h3><a href="" class="stretched-link">Hoteles de Red & Co-Living</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="1100">
+            <div class="features-item">
+              <i class="bi bi-activity" style="color: #ff5828;"></i>
+              <h3><a href="" class="stretched-link">Hoteles en Tendencia / Más Reservados</a></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="1200">
+            <div class="features-item">
+              <i class="bi bi-brightness-high" style="color: #29cc61;"></i>
+              <h3><a href="" class="stretched-link">Hoteles de Sol & Playa</a></h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="courses" class="courses section">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Alojamientos</h2>
+        <p>Hoteles Populares</p>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 col-md-6 d-flex align-items-stretch" data-aos="zoom-in" data-aos-delay="100">
+            <div class="course-item w-100 d-flex flex-column">
+              <img src="{% static 'assets/img/hotel1.jpg' %}" class="img-fluid" alt="..." style="height: 220px; width: 100%; object-fit: cover; object-position: center;">
+              
+              <div class="course-content d-flex flex-column flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <p class="category">Playa & Relax</p>
+                  <p class="price">$169</p>
+                </div>
+
+                <h3><a href="#">Hotel Vista Mar Resort</a></h3>
+                <p class="description flex-grow-1">Disfruta de una estancia inolvidable frente al mar con acceso privado a la playa, piscina infinita y todas las comodidades que necesitas.</p>
+                
+                <div class="trainer d-flex justify-content-between align-items-center mt-auto">
+                  <div class="trainer-profile d-flex align-items-center">
+                    <img src="{% static 'assets/img/.jpg' %}" class="img-fluid" alt="">
+                    <a href="" class="trainer-link"></a>
+                  </div>
+                  <div class="trainer-rank d-flex align-items-center">
+                    <i class="bi bi-person user-icon"></i>&nbsp;50
+                    &nbsp;&nbsp;
+                    <i class="bi bi-heart heart-icon"></i>&nbsp;65
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 d-flex align-items-stretch mt-4 mt-md-0" data-aos="zoom-in" data-aos-delay="200">
+            <div class="course-item w-100 d-flex flex-column">
+              <img src="{% static 'assets/img/hotel2.jpg' %}" class="img-fluid" alt="..." style="height: 220px; width: 100%; object-fit: cover; object-position: center;">
+              
+              <div class="course-content d-flex flex-column flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <p class="category">Ciudad & Negocios</p>
+                  <p class="price">$250</p>
+                </div>
+
+                <h3><a href="#">Grand Executive Hotel</a></h3>
+                <p class="description flex-grow-1">Ubicado en el corazón del centro financiero. Ideal para viajes de negocios, con salas de reuniones, Wi-Fi de alta velocidad y buffet ejecutivo.</p>
+                
+                <div class="trainer d-flex justify-content-between align-items-center mt-auto">
+                  <div class="trainer-profile d-flex align-items-center">
+                    <img src="{% static 'assets/img/trainers/.jpg' %}" class="img-fluid" alt="">
+                    <a href="" class="trainer-link"></a>
+                  </div>
+                  <div class="trainer-rank d-flex align-items-center">
+                    <i class="bi bi-person user-icon"></i>&nbsp;35
+                    &nbsp;&nbsp;
+                    <i class="bi bi-heart heart-icon"></i>&nbsp;42
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 d-flex align-items-stretch mt-4 mt-lg-0" data-aos="zoom-in" data-aos-delay="300">
+            <div class="course-item w-100 d-flex flex-column">
+              <img src="{% static 'assets/img/hotel3.jpg' %}" class="img-fluid" alt="..." style="height: 220px; width: 100%; object-fit: cover; object-position: center;">
+              
+              <div class="course-content d-flex flex-column flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <p class="category">Montaña & Naturaleza</p>
+                  <p class="price">$180</p>
+                </div>
+
+                <h3><a href="#">Cabañas Eco Suite</a></h3>
+                <p class="description flex-grow-1">Conéctate con la naturaleza en un entorno tranquilo y acogedor. Ofrece vistas panorámicas a las montañas y actividades al aire libre.</p>
+                
+                <div class="trainer d-flex justify-content-between align-items-center mt-auto">
+                  <div class="trainer-profile d-flex align-items-center">
+                    <img src="{% static 'assets/img/trainers/.jpg' %}" class="img-fluid" alt="">
+                    <a href="" class="trainer-link"></a>
+                  </div>
+                  <div class="trainer-rank d-flex align-items-center">
+                    <i class="bi bi-person user-icon"></i>&nbsp;20
+                    &nbsp;&nbsp;
+                    <i class="bi bi-heart heart-icon"></i>&nbsp;85
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="trainers-index" class="section trainers-index py-4">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-3 col-md-5 col-sm-8" data-aos="fade-up" data-aos-delay="200">
+            <div class="member shadow-sm rounded overflow-hidden mx-auto" style="max-width: 320px; background: #fff; text-align: center;">
+              <img src="{% static 'assets/img/Angelo1.jpg' %}" class="img-fluid" alt="Angelo López" style="height: 240px; width: 100%; object-fit: cover; object-position: center top;">
+              <div class="member-content p-3">
+                <h4 class="mb-1" style="font-size: 1.25rem;">Angelo López</h4>
+                <span class="d-block text-muted mb-2" style="font-size: 0.9rem;">Gerente de Reservas</span>
+                <p class="fst-italic text-secondary small mb-3">
+                  "Nos aseguramos de que cada reserva sea transparente y sin complicaciones, para que tu única preocupación sea disfrutar de tu estancia."
+                </p>
+                <div class="social d-flex justify-content-center gap-3">
+                  <a href="https://www.facebook.com/share/19GdrJKV5x/?mibextid=wwXIfr" class="text-secondary"><i class="bi bi-facebook"></i></a>
+                  <a href="https://www.instagram.com/brenthon.25?igsh=MWtnY2xobmxma3p6ZA%3D%3D&utm_source=qr" class="text-secondary"><i class="bi bi-instagram"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+{% endblock %}

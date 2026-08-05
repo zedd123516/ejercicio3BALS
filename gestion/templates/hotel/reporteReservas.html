@@ -1,0 +1,117 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+<script 
+src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<br>
+
+<center> 
+    <table> 
+        <tr> 
+            <td style="text-align: left; width: 800px;">
+                <img src="{% static 'assets/img/hotelz.jpg' %}" alt="Logo UTC">
+            </td> 
+            <td style="text-align: right; width: 800px;">
+                <img src="{% static 'assets/img/logo1.jpg' %}">
+            </td> 
+        </tr> 
+    </table> 
+
+    <h1>REPORTES DE RESERVAS HOTELERAS</h1> 
+</center> 
+<br>
+
+{% for r in reservas %} 
+    <center> 
+        <div>       
+
+            <div style="width:200px; float:left; padding-left:20px !important;"> 
+                <div id="qrcode{{ r.id }}"></div> 
+                <script type="text/javascript"> 
+                    (function() {
+                        var idRes = "{{ r.id }}";
+                        var nomH = "{{ r.huesped.nombres|default:''|escapejs }}";
+                        var apeH = "{{ r.huesped.apellidos|default:''|escapejs }}";
+                        var numHab = "{{ r.habitacion.numero|default:''|escapejs }}";
+                        var fEnt = "{{ r.fecha_entrada|date:'Y-m-d'|default:'' }}";
+                        var fSal = "{{ r.fecha_salida|date:'Y-m-d'|default:'' }}";
+                        var est = "{{ r.estado|default:''|escapejs }}";
+                        var tar = "{{ r.tarifa_base|default:'0' }}";
+
+                        var texto = "RESERVA #" + idRes + "\nHUESPED: " + nomH + " " + apeH + "\nHABITACION: " + numHab + "\nENTRADA: " + fEnt + "\nSALIDA: " + fSal + "\nESTADO: " + est + "\nTARIFA: $" + tar; 
+                        
+                        new QRCode(document.getElementById("qrcode{{ r.id }}"), { 
+                            text: texto, 
+                            width: 128, 
+                            height: 128, 
+                            colorDark : "#000", 
+                            colorLight : "#ffffff"
+                        });
+                    })();
+                </script> 
+            </div> 
+
+            <div style="width:50%; padding-left:20px;"> 
+                <hr> 
+                <h5 style="text-transform: uppercase;"><b>RESERVA #00{{ r.id }} - HUÉSPED: {{ r.huesped.nombres }} {{ r.huesped.apellidos }}</b></h5> 
+                <hr> 
+                <h5 style="text-transform: uppercase;"><b>HABITACIÓN #{{ r.habitacion.numero }} ({{ r.habitacion.tipo }})</b></h5> 
+                <hr> 
+                <h5><b>FECHA ENTRADA: </b> {{ r.fecha_entrada }} | <b>FECHA SALIDA: </b> {{ r.fecha_salida }}</h5> 
+                <hr> 
+                <h5><b>NÚMERO DE HUÉSPEDES: </b> {{ r.numero_huespedes }} Personas</h5> 
+                <hr> 
+                <h5><b>ESTADO: </b> {{ r.estado|upper }} | <b>CANAL: </b> {{ r.canal_origen|title }} | <b>TARIFA BASE: </b> ${{ r.tarifa_base }}</h5> 
+            </div> 
+        </div> 
+    </center> 
+    <br>  
+{% empty %}
+    <center><h3>No hay reservas registradas.</h3></center>
+{% endfor %} 
+
+<center> 
+    <br><br> 
+    ......................................... <br> 
+    <b>FIRMA DE RESPONSABILIDAD</b> <br> 
+    <b>C.I.:___________________</b> <br> 
+    <b>GERENTE DE RECEPCIÓN / HOTEL</b> 
+</center> 
+
+<center> 
+    <br> 
+    <button onclick="window.print();">Imprimir Reporte</button> 
+</center> 
+<br> 
+
+<style media="print"> 
+    button { 
+        display: none; 
+    } 
+    @page { 
+        /* size: landscape; */ 
+    } 
+</style> 
+
+<script> 
+    // Función para auto-imprimir pantalla al abrir
+    window.print(); 
+</script> 
+
+<script type="text/javascript"> 
+    var urlActual = window.location.href; 
+    var elemQr = document.getElementById("qrcode");
+    if (elemQr) {
+        new QRCode(elemQr, { 
+            text: urlActual, 
+            width: 128, 
+            height: 128, 
+            colorDark : "#00f", 
+            colorLight : "#ffffff", 
+            correctLevel : QRCode.CorrectLevel.H 
+        }); 
+    }
+</script>

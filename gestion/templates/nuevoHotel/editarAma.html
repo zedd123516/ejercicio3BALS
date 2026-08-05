@@ -1,0 +1,89 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <br>
+                <h1><b>Actualizar Ama de Llaves</b></h1>
+                <hr>
+                <form id="form_editar_ama" action="/procesar-actualizacion-ama/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ ama.id }}" readonly>
+
+                    <b>Nombre:</b> <br>
+                    <input required placeholder="Ingrese el nombre completo" class="form-control" type="text" name="nombre" value="{{ ama.nombre }}">
+                    <br>
+
+                    <b>Turno:</b> <br>
+                    <select required class="form-control" name="turno">
+                        <option value="Mañana" {% if ama.turno == 'Mañana' %}selected{% endif %}>Mañana</option>
+                        <option value="Tarde" {% if ama.turno == 'Tarde' %}selected{% endif %}>Tarde</option>
+                        <option value="Noche" {% if ama.turno == 'Noche' %}selected{% endif %}>Noche</option>
+                    </select>
+                    <br>
+
+                    <b>Teléfono:</b> <br>
+                    <input required placeholder="Ingrese el número de teléfono" class="form-control" type="text" name="telefono" value="{{ ama.telefono }}">
+                    <br>
+
+                    <b>Piso Asignado:</b> <br>
+                    <input required placeholder="Ingrese el piso asignado" class="form-control" type="number" name="piso_asignado" value="{{ ama.piso_asignado }}">
+                    <br> <br>
+
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" type="submit">
+                            <i class="bi bi-check-circle"></i> Actualizar
+                        </button>
+                        <a href="/amas/" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#form_editar_ama").validate({
+            rules:{
+                nombre:{
+                    required: true,
+                    minlength: 3
+                },
+                turno:{
+                    required: true
+                },
+                telefono:{
+                    required: true,
+                    minlength: 7
+                },
+                piso_asignado:{
+                    required: true,
+                    min: 1,
+                    number: true
+                }
+            },
+            messages:{
+                nombre:{
+                    required: "Por favor ingrese el nombre",
+                    minlength: "Debe ingresar al menos 3 caracteres"
+                },
+                turno:{
+                    required: "Por favor seleccione un turno"
+                },
+                telefono:{
+                    required: "Por favor ingrese el teléfono",
+                    minlength: "Ingrese un teléfono válido"
+                },
+                piso_asignado:{
+                    required: "Por favor ingrese el piso asignado",
+                    min: "El número de piso debe ser al menos 1",
+                    number: "Por favor ingrese un número válido"
+                }
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <br>
+                <h1><b>Actualizar Reserva</b></h1>
+                <hr>
+                <form id="form_editar_reserva" action="/procesar-actualizacion-reserva/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ reserva.id }}" readonly>
+
+                    <b>Huésped:</b> <br>
+                    <select required class="form-control" name="huesped">
+                        {% for huesped in huespedes %}
+                        <option value="{{ huesped.id }}" {% if huesped.id == reserva.huesped.id %}selected{% endif %}>{{ huesped.nombres }} {{ huesped.apellidos }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+
+                    <b>Habitación:</b> <br>
+                    <select required class="form-control" name="habitacion">
+                        {% for habitacion in habitaciones %}
+                        <option value="{{ habitacion.id }}" {% if habitacion.id == reserva.habitacion.id %}selected{% endif %}>{{ habitacion.numero }} - {{ habitacion.tipo }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+
+                    <b>Fecha Entrada:</b> <br>
+                    <input required class="form-control" type="date" name="fecha_entrada" value="{{ reserva.fecha_entrada }}">
+                    <br>
+
+                    <b>Fecha Salida:</b> <br>
+                    <input required class="form-control" type="date" name="fecha_salida" value="{{ reserva.fecha_salida }}">
+                    <br>
+
+                    <b>Estado:</b> <br>
+                    <select class="form-control" name="estado">
+                        <option value="confirmada" {% if reserva.estado == 'confirmada' %}selected{% endif %}>Confirmada</option>
+                        <option value="checked_in" {% if reserva.estado == 'checked_in' %}selected{% endif %}>Check-in</option>
+                        <option value="checked_out" {% if reserva.estado == 'checked_out' %}selected{% endif %}>Check-out</option>
+                        <option value="cancelada" {% if reserva.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                    </select>
+                    <br>
+
+                    <b>Número de Huéspedes:</b> <br>
+                    <input required placeholder="Ingrese la cantidad de huéspedes" class="form-control" type="number" name="numero_huespedes" value="{{ reserva.numero_huespedes }}">
+                    <br>
+
+                    <b>Canal Origen:</b> <br>
+                    <select class="form-control" name="canal_origen">
+                        <option value="directo" {% if reserva.canal_origen == 'directo' %}selected{% endif %}>Directo</option>
+                        <option value="booking" {% if reserva.canal_origen == 'booking' %}selected{% endif %}>Booking</option>
+                        <option value="agencia" {% if reserva.canal_origen == 'agencia' %}selected{% endif %}>Agencia</option>
+                        <option value="corporativo" {% if reserva.canal_origen == 'corporativo' %}selected{% endif %}>Corporativo</option>
+                    </select>
+                    <br>
+
+                    <b>Tarifa Base:</b> <br>
+                    <input required placeholder="Ingrese la tarifa base" class="form-control" type="number" step="0.01" name="tarifa_base" value="{{ reserva.tarifa_base }}">
+                    <br>
+
+                    <b>Notas:</b> <br>
+                    <textarea placeholder="Ingrese alguna observación o nota" class="form-control" name="notas" rows="3">{{ reserva.notas }}</textarea>
+                    <br> <br>
+
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" type="submit">
+                            <i class="bi bi-check-circle"></i> Actualizar
+                        </button>
+                        <a href="/reservas/" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#form_editar_reserva").validate({
+            rules:{
+                huesped:{
+                    required: true
+                },
+                habitacion:{
+                    required: true
+                },
+                fecha_entrada:{
+                    required: true
+                },
+                fecha_salida:{
+                    required: true
+                },
+                numero_huespedes:{
+                    required: true,
+                    min: 1,
+                    number: true
+                },
+                tarifa_base:{
+                    required: true,
+                    min: 0,
+                    number: true
+                }
+            },
+            messages:{
+                huesped:{
+                    required: "Por favor seleccione un huésped"
+                },
+                habitacion:{
+                    required: "Por favor seleccione una habitación"
+                },
+                fecha_entrada:{
+                    required: "Por favor seleccione la fecha de entrada"
+                },
+                fecha_salida:{
+                    required: "Por favor seleccione la fecha de salida"
+                },
+                numero_huespedes:{
+                    required: "Por favor ingrese el número de huéspedes",
+                    min: "Debe ingresar al menos 1 huésped",
+                    number: "Por favor ingrese un número válido"
+                },
+                tarifa_base:{
+                    required: "Por favor ingrese la tarifa base",
+                    min: "El valor debe ser positivo",
+                    number: "Por favor ingrese un monto válido"
+                }
+            }
+        });
+    </script>
+{% endblock %}

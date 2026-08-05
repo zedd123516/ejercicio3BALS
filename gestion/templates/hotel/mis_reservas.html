@@ -1,0 +1,85 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <center>
+        <br>
+        <h1><b>Mis Reservas de Hotel</b>            
+            <a href="/reservar-cliente/" class="btn btn-info text-white"> 
+                <i class="bi bi-plus-circle"></i>
+                Hacer Nueva Reserva
+            </a>
+            <!-- target="_blank" -->
+            <a href="/reporteMisReservas/" onclick="window.open(this.href,'Reporte Mis Reservas','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark">
+                <i class="bi bi-eye"></i>
+                Imprimir Reporte
+            </a>        
+        </h1>
+        <hr>
+    </center>
+    <br>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <table id="tbl_mis_reservas" class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th># Reserva</th>
+                        <th>Habitación</th>
+                        <th>Fechas</th>
+                        <th>Huéspedes</th>
+                        <th>Estado</th>
+                        <th>Servicios Incluidos</th>
+                        <th>Tarifa Base</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas %}
+                    <tr>
+                        <td class="fw-bold">#{{ reserva.id }}</td>
+                        <td>
+                            <strong>Habitación {{ reserva.habitacion.numero }}</strong>
+                            <br><small class="text-muted">{{ reserva.habitacion.tipo }} (Piso {{ reserva.habitacion.piso }})</small>
+                        </td>
+                        <td>
+                            <i class="bi bi-calendar-event text-primary me-1"></i>{{ reserva.fecha_entrada|date:"d/m/Y" }}
+                            <span class="mx-1">&rarr;</span>
+                            <i class="bi bi-calendar-check text-success me-1"></i>{{ reserva.fecha_salida|date:"d/m/Y" }}
+                        </td>
+                        <td><i class="bi bi-people me-1"></i>{{ reserva.numero_huespedes }} personas</td>
+                        <td>
+                            {% if reserva.estado == 'confirmada' %}
+                                <span class="badge bg-success">Confirmada</span>
+                            {% elif reserva.estado == 'checked_in' %}
+                                <span class="badge bg-primary">En Estadía (Check-in)</span>
+                            {% elif reserva.estado == 'checked_out' %}
+                                <span class="badge bg-secondary">Finalizada (Check-out)</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ reserva.estado }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for item in reserva.servicios.all %}
+                                <span class="badge bg-info text-dark">{{ item.servicio.nombre }} (${{ item.servicio.precio }})</span>
+                            {% empty %}
+                                <small class="text-muted">Ninguno</small>
+                            {% endfor %}
+                        </td>
+                        <td class="fw-bold text-success">${{ reserva.tarifa_base }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="bi bi-calendar-x fs-2 d-block mb-2"></i>
+                            Aún no tienes reservas registradas. ¡Haz clic en "Hacer Nueva Reserva" para comenzar!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let table = new DataTable('#tbl_mis_reservas');
+    </script>
+{% endblock %}

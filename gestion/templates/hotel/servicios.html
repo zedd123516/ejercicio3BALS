@@ -1,0 +1,58 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <center>
+        <br>
+        <h1><b>Servicios Extra Registrados</b>            
+            <a href="/nuevo-servicio/" class="btn btn-info text-white"> 
+                <i class="bi bi-plus-circle"></i>
+                Nuevo Servicio
+            </a>
+            <!-- target="_blank" -->
+            <a href="/reporteServicios/" onclick="window.open(this.href,'Reporte Servicios','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark">
+                <i class="bi bi-eye"></i>
+                Imprimir Reporte
+            </a>        
+        </h1>
+        <hr>
+    </center>
+    <br>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <table id="tbl_servicios" class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for servicio in servicios %}
+                    <tr>
+                        <td>{{ servicio.nombre }}</td>
+                        <td>{{ servicio.descripcion }}</td>
+                        <td>${{ servicio.precio }}</td>
+                        <td>
+                            <a href="/editar-servicio/{{ servicio.id }}/" class="btn btn-outline-warning btn-sm" title="Editar Servicio">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="#" onclick="confirmacion(event, '/eliminar-servicio/{{ servicio.id }}/')" class="btn btn-outline-danger btn-sm" title="Eliminar Servicio">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center text-muted">No hay servicios registrados</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let table = new DataTable('#tbl_servicios');
+    </script>
+{% endblock %}

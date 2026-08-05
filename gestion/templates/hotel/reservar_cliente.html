@@ -1,0 +1,115 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <br>
+                <h1><b>Reserva tu Habitación</b></h1>
+                <hr>
+                <form id="form_reserva_publica" method="post">
+                    <!--Metodo de token para peticiones autorizadas-->
+                    {% csrf_token %}
+
+                    <b>1. Selecciona la Habitación Disponible:</b> <br>
+                    <select required name="habitacion" id="habitacion" class="form-control">
+                        <option value="">-- Elige una Habitación --</option>
+                        {% for habitacion in habitaciones %}
+                        <option value="{{ habitacion.id }}">
+                            Habitación {{ habitacion.numero }} - {{ habitacion.tipo }} (Piso {{ habitacion.piso }}) - Capacidad: {{ habitacion.capacidad }} pers. - ${{ habitacion.precio_noche }}/noche
+                        </option>
+                        {% empty %}
+                        <option value="" disabled>No hay habitaciones disponibles por el momento</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+
+                    <b>2. Fecha de Entrada:</b> <br>
+                    <input required type="date" name="fecha_entrada" id="fecha_entrada" class="form-control">
+                    <br>
+
+                    <b>3. Fecha de Salida:</b> <br>
+                    <input required type="date" name="fecha_salida" id="fecha_salida" class="form-control">
+                    <br>
+
+                    <b>4. Número de Huéspedes:</b> <br>
+                    <input required type="number" name="numero_huespedes" id="numero_huespedes" class="form-control" min="1" max="10" value="1" placeholder="Ingrese el número de huéspedes">
+                    <br>
+
+                    {% if servicios %}
+                    <b>5. Servicios Extras Opcionales:</b> <br>
+                    <div class="p-2 border rounded">
+                        {% for servicio in servicios %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="servicios" value="{{ servicio.id }}" id="servicio_{{ servicio.id }}">
+                            <label class="form-check-label" for="servicio_{{ servicio.id }}">
+                                <strong>{{ servicio.nombre }}</strong> 
+                                <span class="badge bg-success">+${{ servicio.precio }}</span>
+                                {% if servicio.descripcion %}
+                                <br><small class="text-muted">{{ servicio.descripcion }}</small>
+                                {% endif %}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <br>
+                    {% endif %}
+
+                    <b>6. Solicitudes o Notas Especiales:</b> <br>
+                    <textarea name="notas" id="notas" class="form-control" rows="3" placeholder="Ejemplo: Hora estimada de llegada, preferencia de cama..."></textarea>
+                    <br> <br>
+
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" type="submit"> 
+                            <i class="bi bi-check-circle"></i> Confirmar mi Reserva
+                        </button>
+                        <a href="/mis-reservas/" class="btn btn-danger"> 
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#form_reserva_publica").validate({
+            rules:{
+                habitacion:{
+                    required: true
+                },
+                fecha_entrada:{
+                    required: true
+                },
+                fecha_salida:{
+                    required: true
+                },
+                numero_huespedes:{
+                    required: true,
+                    min: 1,
+                    max: 10,
+                    number: true
+                }
+            },
+            messages:{
+                habitacion:{
+                    required: "Por favor seleccione una habitación"
+                },
+                fecha_entrada:{
+                    required: "Por favor ingrese la fecha de entrada"
+                },
+                fecha_salida:{
+                    required: "Por favor ingrese la fecha de salida"
+                },
+                numero_huespedes:{
+                    required: "Por favor ingrese la cantidad de huéspedes",
+                    min: "Debe ser al menos 1 huésped",
+                    max: "No puede exceder 10 huéspedes",
+                    number: "Por favor introduzca un número válido"
+                }
+            }
+        });
+    </script>
+{% endblock %}

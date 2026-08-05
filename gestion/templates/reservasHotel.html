@@ -1,0 +1,699 @@
+{% extends './plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+<div class="container-fluid py-5">
+  <div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+      <h2 class="fw-bold">Sistema de Reservas para Hoteles</h2>
+      <p class="text-muted mb-0">Dashboard de ocupación, gestión de habitaciones, huéspedes, reservas y reportes.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+      <button id="btnTourTarifas" class="btn btn-warning shadow-sm"><i class="bi bi-info-circle me-1"></i> Tour Guiado de Tarifas (Driver.js)</button>
+    </div>
+  </div>
+
+  <!-- Dashboard con métricas clave -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 bg-primary text-white position-relative overflow-hidden">
+        <div class="card-body p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-white-50 small fw-bold text-uppercase">Tasa de Ocupación</span>
+            <i class="bi bi-pie-chart-fill fs-4 text-white-50"></i>
+          </div>
+          <h2 class="fw-bold mb-1">{{ ocupacion }}%</h2>
+          <small class="text-white-50"><i class="bi bi-door-open me-1"></i>Habitaciones activas</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 bg-gradient text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+        <div class="card-body p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-white-50 small fw-bold text-uppercase" data-bs-toggle="tooltip" title="Revenue Per Available Room - Ingreso promedio por habitación disponible">
+              RevPAR <i class="bi bi-info-circle ms-1"></i>
+            </span>
+            <i class="bi bi-cash-stack fs-4 text-white-50"></i>
+          </div>
+          <h2 class="fw-bold mb-1">${{ revpar }}</h2>
+          <small class="text-white-50"><i class="bi bi-calculator me-1"></i>Ingreso / Total Habs.</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 bg-gradient text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #198754 0%, #146c43 100%);">
+        <div class="card-body p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-white-50 small fw-bold text-uppercase" data-bs-toggle="tooltip" title="Average Daily Rate - Tarifa promedio diaria por habitación ocupada">
+              ADR <i class="bi bi-info-circle ms-1"></i>
+            </span>
+            <i class="bi bi-currency-dollar fs-4 text-white-50"></i>
+          </div>
+          <h2 class="fw-bold mb-1">${{ adr }}</h2>
+          <small class="text-white-50"><i class="bi bi-graph-up-arrow me-1"></i>Tarifa Promedio Noche</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 bg-dark text-white position-relative overflow-hidden">
+        <div class="card-body p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-white-50 small fw-bold text-uppercase">Ingresos Totales</span>
+            <i class="bi bi-wallet2 fs-4 text-white-50"></i>
+          </div>
+          <h2 class="fw-bold mb-1">${{ total_ingresos }}</h2>
+          <small class="text-white-50"><i class="bi bi-house-door me-1"></i>{{ habitaciones|length }} Habitaciones</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de Gráficos de RevPAR, ADR y Canales -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title fw-bold mb-0"><i class="bi bi-bar-chart-line text-primary me-2"></i>Ingresos y ADR por Canal de Procedencia</h5>
+            <a href="/reportes/" class="btn btn-outline-primary btn-sm"><i class="bi bi-box-arrow-up-right me-1"></i>Ver Reporte Completo</a>
+          </div>
+          <canvas id="chartCanalesIngresos" style="max-height: 260px;"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title fw-bold mb-3"><i class="bi bi-pie-chart text-success me-2"></i>Distribución de Reservas por Canal</h5>
+          <canvas id="chartCanalesDonut" style="max-height: 260px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline Mensual FullCalendar & Zona Upgrade -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="card-title fw-bold mb-0"><i class="bi bi-calendar3 me-2 text-primary"></i>Timeline Mensual de Ocupación (FullCalendar)</h5>
+        <span class="badge bg-light text-dark border"><i class="bi bi-keyboard me-1"></i>Hotkeys: Presiona <strong>[I]</strong> para Check-in, <strong>[O]</strong> para Check-out</span>
+      </div>
+      <div id="calendar" style="min-height: 400px;"></div>
+    </div>
+  </div>
+
+  <!-- Secciones de tablas completas con DataTables y botones de reporte -->
+  <div class="row g-4">
+    <!-- HABITACIONES -->
+    <div class="col-lg-12" id="habitaciones">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title fw-bold text-dark mb-0"><i class="bi bi-door-open text-primary me-2"></i>Habitaciones Registradas</h5>
+            <div>
+              <a href="/nueva-habitacion/" class="btn btn-success btn-sm me-2"><i class="bi bi-plus-circle me-1"></i>Nueva Habitación</a>
+              <a href="/reporteHabitaciones/" onclick="window.open(this.href,'Reporte Habitaciones','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark btn-sm"><i class="bi bi-printer me-1"></i>Imprimir Reporte</a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="tbl_dashboard_habitaciones" class="table table-hover table-striped align-middle w-100">
+              <thead class="table-light">
+                <tr>
+                  <th>Número</th>
+                  <th>Tipo</th>
+                  <th>Capacidad</th>
+                  <th>Precio</th>
+                  <th>Piso</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for habitacion in habitaciones %}
+                <tr>
+                  <td class="fw-bold">{{ habitacion.numero }}</td>
+                  <td>{{ habitacion.tipo }}</td>
+                  <td>{{ habitacion.capacidad }} personas</td>
+                  <td class="fw-bold text-success">${{ habitacion.precio_noche }}</td>
+                  <td>Piso {{ habitacion.piso }}</td>
+                  <td><span class="badge bg-success">{{ habitacion.estado }}</span></td>
+                  <td>
+                    <a href="/editar-habitacion/{{ habitacion.id }}/" class="btn btn-warning btn-sm me-1" title="Editar Habitación"><i class="bi bi-pencil"></i></a>
+                    <a href="#" onclick="confirmacion(event, '/eliminar-habitacion/{{ habitacion.id }}/')" class="btn btn-danger btn-sm" title="Eliminar Habitación"><i class="bi bi-trash"></i></a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-3">No hay habitaciones registradas</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUÉSPEDES -->
+    <div class="col-lg-12" id="huespedes">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title fw-bold text-dark mb-0"><i class="bi bi-people text-primary me-2"></i>Huéspedes Registrados</h5>
+            <div>
+              <a href="/nuevo-huesped/" class="btn btn-success btn-sm me-2"><i class="bi bi-plus-circle me-1"></i>Nuevo Huésped</a>
+              <a href="/reporteHuespedes/" onclick="window.open(this.href,'Reporte Huéspedes','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark btn-sm"><i class="bi bi-printer me-1"></i>Imprimir Reporte</a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="tbl_dashboard_huespedes" class="table table-hover table-striped align-middle w-100">
+              <thead class="table-light">
+                <tr>
+                  <th>Nombres</th>
+                  <th>Apellidos</th>
+                  <th>Documento</th>
+                  <th>Email</th>
+                  <th>Teléfono</th>
+                  <th>Nacionalidad</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for huesped in huespedes %}
+                <tr>
+                  <td class="fw-bold">{{ huesped.nombres }}</td>
+                  <td>{{ huesped.apellidos }}</td>
+                  <td><code>{{ huesped.documento }}</code></td>
+                  <td>{{ huesped.email|default:"-" }}</td>
+                  <td>{{ huesped.telefono|default:"-" }}</td>
+                  <td>{{ huesped.nacionalidad }}</td>
+                  <td>
+                    <a href="/editar-huesped/{{ huesped.id }}/" class="btn btn-warning btn-sm me-1" title="Editar Huésped"><i class="bi bi-pencil"></i></a>
+                    <a href="#" onclick="confirmacion(event, '/eliminar-huesped/{{ huesped.id }}/')" class="btn btn-danger btn-sm" title="Eliminar Huésped"><i class="bi bi-trash"></i></a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-3">No hay huéspedes registrados</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESERVAS -->
+    <div class="col-lg-12" id="reservas">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title fw-bold text-dark mb-0"><i class="bi bi-journal-bookmark text-primary me-2"></i>Reservas Registradas</h5>
+            <div>
+              <a href="/nueva-reserva/" class="btn btn-success btn-sm me-2"><i class="bi bi-plus-circle me-1"></i>Nueva Reserva</a>
+              <a href="/reporteReservas/" onclick="window.open(this.href,'Reporte Reservas','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark btn-sm"><i class="bi bi-printer me-1"></i>Imprimir Reporte</a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="tbl_dashboard_reservas" class="table table-hover table-striped align-middle w-100">
+              <thead class="table-light">
+                <tr>
+                  <th>Huésped</th>
+                  <th>Habitación</th>
+                  <th>Entrada</th>
+                  <th>Salida</th>
+                  <th>Estado</th>
+                  <th>Canal</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for reserva in reservas %}
+                <tr>
+                  <td class="fw-bold">{{ reserva.huesped.nombres }} {{ reserva.huesped.apellidos }}</td>
+                  <td>Hab. {{ reserva.habitacion.numero }}</td>
+                  <td>{{ reserva.fecha_entrada }}</td>
+                  <td>{{ reserva.fecha_salida }}</td>
+                  <td><span class="badge bg-info text-dark">{{ reserva.estado }}</span></td>
+                  <td><span class="badge bg-light text-dark border">{{ reserva.canal_origen|title }}</span></td>
+                  <td>
+                    <a href="/editar-reserva/{{ reserva.id }}/" class="btn btn-warning btn-sm me-1" title="Editar Reserva"><i class="bi bi-pencil"></i></a>
+                    <a href="#" onclick="confirmacion(event, '/eliminar-reserva/{{ reserva.id }}/')" class="btn btn-danger btn-sm" title="Eliminar Reserva"><i class="bi bi-trash"></i></a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-3">No hay reservas registradas</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICIOS EXTRA -->
+    <div class="col-lg-12" id="servicios">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title fw-bold text-dark mb-0"><i class="bi bi-stars text-primary me-2"></i>Servicios Extra Registrados</h5>
+            <div>
+              <a href="/nuevo-servicio/" class="btn btn-success btn-sm me-2"><i class="bi bi-plus-circle me-1"></i>Nuevo Servicio</a>
+              <a href="/reporteServicios/" onclick="window.open(this.href,'Reporte Servicios','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark btn-sm"><i class="bi bi-printer me-1"></i>Imprimir Reporte</a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="tbl_dashboard_servicios" class="table table-hover table-striped align-middle w-100">
+              <thead class="table-light">
+                <tr>
+                  <th>Nombre</th>
+                  <th>Descripción</th>
+                  <th>Precio</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for servicio in servicios %}
+                <tr>
+                  <td class="fw-bold">{{ servicio.nombre }}</td>
+                  <td>{{ servicio.descripcion|default:"-" }}</td>
+                  <td class="fw-bold text-success">${{ servicio.precio }}</td>
+                  <td>
+                    <a href="/editar-servicio/{{ servicio.id }}/" class="btn btn-warning btn-sm me-1" title="Editar Servicio"><i class="bi bi-pencil"></i></a>
+                    <a href="#" onclick="confirmacion(event, '/eliminar-servicio/{{ servicio.id }}/')" class="btn btn-danger btn-sm" title="Eliminar Servicio"><i class="bi bi-trash"></i></a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-3">No hay servicios registrados</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AMAS DE LLAVES -->
+    <div class="col-lg-12" id="amas">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title fw-bold text-dark mb-0"><i class="bi bi-person-workspace text-primary me-2"></i>Amas de Llaves Registradas</h5>
+            <div>
+              <a href="/nuevo-ama/" class="btn btn-success btn-sm me-2"><i class="bi bi-plus-circle me-1"></i>Nueva Ama de Llaves</a>
+              <a href="/reporteAmas/" onclick="window.open(this.href,'Reporte Amas de Llaves','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark btn-sm"><i class="bi bi-printer me-1"></i>Imprimir Reporte</a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="tbl_dashboard_amas" class="table table-hover table-striped align-middle w-100">
+              <thead class="table-light">
+                <tr>
+                  <th>Nombre</th>
+                  <th>Turno</th>
+                  <th>Teléfono</th>
+                  <th>Piso Asignado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for ama in amas %}
+                <tr>
+                  <td class="fw-bold">{{ ama.nombre }}</td>
+                  <td><span class="badge bg-secondary">{{ ama.turno }}</span></td>
+                  <td>{{ ama.telefono|default:"-" }}</td>
+                  <td>Piso {{ ama.piso_asignado }}</td>
+                  <td>
+                    <a href="/editar-ama/{{ ama.id }}/" class="btn btn-warning btn-sm me-1" title="Editar Ama"><i class="bi bi-pencil"></i></a>
+                    <a href="#" onclick="confirmacion(event, '/eliminar-ama/{{ ama.id }}/')" class="btn btn-danger btn-sm" title="Eliminar Ama"><i class="bi bi-trash"></i></a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-3">No hay amas de llaves registradas</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FACTURAS -->
+    <div class="col-lg-12" id="facturas">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title fw-bold text-dark mb-0"><i class="bi bi-receipt text-primary me-2"></i>Facturas Registradas</h5>
+            <div>
+              <a href="/reporteFacturas/" onclick="window.open(this.href,'Reporte Facturas','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark btn-sm"><i class="bi bi-printer me-1"></i>Imprimir Reporte</a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="tbl_dashboard_facturas" class="table table-hover table-striped align-middle w-100">
+              <thead class="table-light">
+                <tr>
+                  <th>Número</th>
+                  <th>Total</th>
+                  <th>Estado</th>
+                  <th>Método Pago</th>
+                  <th>Fecha</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for factura in facturas %}
+                <tr>
+                  <td class="fw-bold"><code>{{ factura.numero_factura }}</code></td>
+                  <td class="fw-bold text-success">${{ factura.total }}</td>
+                  <td><span class="badge bg-warning text-dark">{{ factura.estado }}</span></td>
+                  <td>{{ factura.metodo_pago }}</td>
+                  <td>{{ factura.fecha_emision }}</td>
+                  <td>
+                    <a href="/editar-factura/{{ factura.id }}/" class="btn btn-warning btn-sm me-1" title="Editar Factura"><i class="bi bi-pencil"></i></a>
+                    <a href="#" onclick="confirmacion(event, '/eliminar-factura/{{ factura.id }}/')" class="btn btn-danger btn-sm" title="Eliminar Factura"><i class="bi bi-trash"></i></a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-3">No hay facturas registradas</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div class="col-lg-12" id="clientes">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title fw-bold text-dark mb-0"><i class="bi bi-person-badge text-primary me-2"></i>Clientes Registrados</h5>
+            <div>
+              <a href="/reporteClientes/" onclick="window.open(this.href,'Reporte Clientes','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark btn-sm"><i class="bi bi-printer me-1"></i>Imprimir Reporte</a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="tbl_dashboard_clientes" class="table table-hover table-striped align-middle w-100">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Usuario</th>
+                  <th>Nombre Completo</th>
+                  <th>Email</th>
+                  <th>Teléfono</th>
+                  <th>Documento</th>
+                  <th>Nacionalidad</th>
+                  <th>Fecha Registro</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                  <td>{{ cliente.id }}</td>
+                  <td><span class="badge bg-info text-dark">{{ cliente.usuario.username }}</span></td>
+                  <td class="fw-bold">{{ cliente.usuario.get_full_name|default:cliente.usuario.username }}</td>
+                  <td>{{ cliente.usuario.email|default:"-" }}</td>
+                  <td>{{ cliente.telefono|default:"-" }}</td>
+                  <td><code>{{ cliente.documento|default:"-" }}</code></td>
+                  <td>{{ cliente.nacionalidad }}</td>
+                  <td>{{ cliente.fecha_registro|date:"d/m/Y H:i" }}</td>
+                  <td>
+                    <a href="/editar-cliente/{{ cliente.id }}/" class="btn btn-warning btn-sm me-1" title="Editar Cliente"><i class="bi bi-pencil"></i></a>
+                    <a href="#" onclick="confirmacion(event, '/eliminar-cliente/{{ cliente.id }}/')" class="btn btn-danger btn-sm" title="Eliminar Cliente"><i class="bi bi-trash"></i></a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9" class="text-center text-muted py-3">No hay clientes registrados en la plataforma</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTES DE CANALES DE PROCEDENCIA -->
+    <div class="col-lg-12" id="reportes">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title fw-bold text-dark mb-0"><i class="bi bi-diagram-3-fill text-primary me-2"></i>Reportes: Canales de Procedencia de Reservas</h5>
+            <div>
+              <a href="/reporteCanalesPdf/" target="_blank" class="btn btn-dark btn-sm me-2">
+                <i class="bi bi-printer me-1"></i> Imprimir Reporte PDF
+              </a>
+              <a href="/reportes/" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-bar-chart me-1"></i> Módulo Completo
+              </a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="tbl_dashboard_canales" class="table table-hover table-striped align-middle w-100">
+              <thead class="table-light">
+                <tr>
+                  <th>Canal de Procedencia</th>
+                  <th class="text-center">Cantidad Reservas</th>
+                  <th class="text-center">% Participación</th>
+                  <th class="text-end">Tarifa Promedio (ADR)</th>
+                  <th class="text-end">Aporte RevPAR</th>
+                  <th class="text-end">Ingreso Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for canal in canales %}
+                <tr>
+                  <td class="fw-semibold">
+                    {% if canal.canal_origen == 'directo' %}
+                      <span class="badge bg-primary me-2"><i class="bi bi-person-check-fill"></i></span>
+                    {% elif canal.canal_origen == 'booking' %}
+                      <span class="badge bg-info me-2"><i class="bi bi-globe"></i></span>
+                    {% elif canal.canal_origen == 'agencia' %}
+                      <span class="badge bg-warning text-dark me-2"><i class="bi bi-briefcase-fill"></i></span>
+                    {% else %}
+                      <span class="badge bg-secondary me-2"><i class="bi bi-building"></i></span>
+                    {% endif %}
+                    {{ canal.nombre }}
+                  </td>
+                  <td class="text-center"><span class="badge bg-light text-dark border px-3 fs-6">{{ canal.cantidad }}</span></td>
+                  <td class="text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                      <span class="me-2 fw-semibold">{{ canal.porcentaje }}%</span>
+                      <div class="progress flex-grow-1" style="height: 6px; max-width: 80px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ canal.porcentaje }}%"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-end fw-bold text-success">${{ canal.adr }}</td>
+                  <td class="text-end fw-bold text-primary">${{ canal.revpar_aporte }}</td>
+                  <td class="text-end fw-bold">${{ canal.ingreso }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted">No hay reportes disponibles</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.0/dist/driver.css"/>
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script src='https://code.jquery.com/ui/1.13.2/jquery-ui.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/hotkeys-js@3.0.0/hotkeys.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/driver.js@1.3.0/dist/driver.js.iife.js'></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 1. Inicialización de FullCalendar Timeline Mensual
+    var calendarEl = document.getElementById('calendar');
+    var eventosData = {{ eventos_json|safe }};
+    
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'es',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek'
+      },
+      events: eventosData,
+      eventClick: function(info) {
+        Swal.fire({
+          title: info.event.title,
+          html: `<p><strong>Estado:</strong> ${info.event.extendedProps.estado || 'Confirmada'}</p>
+                 <p><strong>Habitación:</strong> ${info.event.extendedProps.habitacion || ''}</p>`,
+          icon: 'info'
+        });
+      }
+    });
+    calendar.render();
+
+    // 2. Drag and Drop Upgrade de Habitación (jQuery UI)
+    $(".table tbody tr").draggable({
+      helper: "clone",
+      revert: "invalid",
+      cursor: "move",
+      opacity: 0.7
+    });
+
+    $("#habitaciones").droppable({
+      accept: ".table tbody tr",
+      drop: function(event, ui) {
+        var textoFila = ui.draggable.text().trim();
+        Swal.fire({
+          title: 'Upgrade de Habitación',
+          text: '¿Deseas realizar el cambio/upgrade de habitación para esta reserva?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, aplicar Upgrade',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire('¡Upgrade Exitoso!', 'La reserva ha sido reasignada a la nueva categoría de habitación.', 'success');
+          }
+        });
+      }
+    });
+
+    // 3. Tour Guiado de Tarifas de Temporada (Driver.js)
+    const driver = window.driver.js.driver;
+    const driverObj = driver({
+      showProgress: true,
+      steps: [
+        { element: '#btnTourTarifas', popover: { title: 'Tour Guiado de Tarifas', description: 'Te damos la bienvenida al módulo de gestión de tarifas de temporada del hotel.' } },
+        { element: '.col-md-3:nth-child(1)', popover: { title: 'Métrica de Ocupación', description: 'Indica el porcentaje actual de habitaciones ocupadas frente al total.' } },
+        { element: '.col-md-3:nth-child(2)', popover: { title: 'RevPAR (Revenue Per Available Room)', description: 'Ingreso promedio generado por cada habitación disponible en el hotel.' } },
+        { element: '.col-md-3:nth-child(3)', popover: { title: 'ADR (Average Daily Rate)', description: 'Tarifa promedio pagada por habitación ocupada por noche.' } },
+        { element: '#habitaciones', popover: { title: 'Gestión de Habitaciones', description: 'Aquí puedes registrar nuevas habitaciones o ajustar los precios base por temporada.' } },
+        { element: '#reportes', popover: { title: 'Canales de Procedencia', description: 'Monitorea qué canales (Booking, Directo, Agencia) aportan más ingresos.' } }
+      ]
+    });
+
+    document.getElementById('btnTourTarifas').addEventListener('click', function() {
+      driverObj.drive();
+    });
+
+    // 4. Hotkeys-js Check-in y Check-out Ultrarrápido sin ratón
+    hotkeys('i', function(event, handler) {
+      event.preventDefault();
+      Swal.fire({
+        title: '⚡ Check-in Ultrarrápido (Hotkey I)',
+        input: 'text',
+        inputLabel: 'Ingrese el número de habitación o ID de reserva:',
+        inputPlaceholder: 'Ej. 101 o Reserva #5',
+        showCancelButton: true,
+        confirmButtonText: 'Realizar Check-in'
+      }).then((result) => {
+        if (result.isConfirmed && result.value) {
+          Swal.fire('Check-in Exitoso', `Check-in procesado para: ${result.value}`, 'success');
+        }
+      });
+    });
+
+    hotkeys('o', function(event, handler) {
+      event.preventDefault();
+      Swal.fire({
+        title: '⚡ Check-out Ultrarrápido (Hotkey O)',
+        input: 'text',
+        inputLabel: 'Ingrese el número de habitación o ID de reserva:',
+        inputPlaceholder: 'Ej. 101 o Reserva #5',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Realizar Check-out'
+      }).then((result) => {
+        if (result.isConfirmed && result.value) {
+          Swal.fire('Check-out Exitoso', `Check-out procesado para: ${result.value}`, 'success');
+        }
+      });
+    });
+
+    // 5. Gráficos Chart.js de Canales, Ingresos y ADR
+    const ctxIngresos = document.getElementById('chartCanalesIngresos');
+    if (ctxIngresos) {
+      new Chart(ctxIngresos, {
+        type: 'bar',
+        data: {
+          labels: {{ canales_labels_json|safe }},
+          datasets: [
+            {
+              label: 'Ingreso Total ($)',
+              data: {{ canales_ingresos_json|safe }},
+              backgroundColor: 'rgba(13, 110, 253, 0.75)',
+              borderColor: '#0d6efd',
+              borderWidth: 1
+            },
+            {
+              label: 'Tarifa Promedio ADR ($)',
+              data: {{ canales_adrs_json|safe }},
+              backgroundColor: 'rgba(25, 135, 84, 0.75)',
+              borderColor: '#198754',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top' }
+          },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    const ctxDonut = document.getElementById('chartCanalesDonut');
+    if (ctxDonut) {
+      new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+          labels: {{ canales_labels_json|safe }},
+          datasets: [{
+            data: {{ canales_cantidades_json|safe }},
+            backgroundColor: [
+              '#0d6efd',
+              '#0dcaf0',
+              '#ffc107',
+              '#6c757d'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+
+    // 6. Inicialización de DataTables para todas las tablas del Dashboard
+    const dataTableOptions = {
+      language: {
+        search: "Buscar:",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        zeroRecords: "No se encontraron registros"
+      }
+    };
+
+    if (document.getElementById('tbl_dashboard_habitaciones')) new DataTable('#tbl_dashboard_habitaciones', dataTableOptions);
+    if (document.getElementById('tbl_dashboard_huespedes')) new DataTable('#tbl_dashboard_huespedes', dataTableOptions);
+    if (document.getElementById('tbl_dashboard_reservas')) new DataTable('#tbl_dashboard_reservas', dataTableOptions);
+    if (document.getElementById('tbl_dashboard_servicios')) new DataTable('#tbl_dashboard_servicios', dataTableOptions);
+    if (document.getElementById('tbl_dashboard_amas')) new DataTable('#tbl_dashboard_amas', dataTableOptions);
+    if (document.getElementById('tbl_dashboard_facturas')) new DataTable('#tbl_dashboard_facturas', dataTableOptions);
+    if (document.getElementById('tbl_dashboard_clientes')) new DataTable('#tbl_dashboard_clientes', dataTableOptions);
+    if (document.getElementById('tbl_dashboard_canales')) new DataTable('#tbl_dashboard_canales', dataTableOptions);
+  });
+</script>
+{% endblock %}

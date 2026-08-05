@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte Oficial: RevPAR, ADR y Canales de Procedencia</title>
+    <link rel="stylesheet" href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-color: #fff;
+            padding: 20px;
+        }
+        .report-header {
+            border-bottom: 2px solid #0d6efd;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 12px;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+        .kpi-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: bold;
+        }
+        .kpi-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header del Reporte -->
+    <div class="row align-items-center report-header">
+        <div class="col-8">
+            <h2 class="fw-bold text-primary mb-1">HOTELZ</h2>
+            <h5 class="text-secondary mb-0">Reporte Oficial de RevPAR, ADR y Canales de Procedencia</h5>
+            <small class="text-muted">Fecha de Generación: {{ fecha_generacion }}</small>
+        </div>
+        <div class="col-4 text-end">
+            <div id="qrcode_general" class="d-inline-block p-1 bg-white border rounded"></div>
+        </div>
+    </div>
+
+    <!-- Resumen Ejecutivo de Métricas (RevPAR & ADR) -->
+    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-speedometer2 text-primary me-2"></i>Resumen Ejecutivo de Rendimiento HotelZ</h5>
+    <div class="row g-3 mb-4">
+        <div class="col-3">
+            <div class="kpi-card">
+                <div class="kpi-title">RevPAR</div>
+                <div class="kpi-value">${{ revpar }}</div>
+                <small class="text-muted">Ingreso / Hab. Disponible</small>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="kpi-card">
+                <div class="kpi-title">ADR</div>
+                <div class="kpi-value text-success">${{ adr }}</div>
+                <small class="text-muted">Tarifa Promedio Noche</small>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="kpi-card">
+                <div class="kpi-title">Tasa Ocupación</div>
+                <div class="kpi-value text-dark">{{ ocupacion }}%</div>
+                <small class="text-muted">Habitaciones Ocupadas</small>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="kpi-card">
+                <div class="kpi-title">Ingresos Totales</div>
+                <div class="kpi-value text-dark">${{ total_ingresos }}</div>
+                <small class="text-muted">Reservas + Facturación</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla Cuadro Comparativo de Canales -->
+    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-table text-primary me-2"></i>Desglose por Canal de Procedencia</h5>
+    <table class="table table-bordered table-striped align-middle mb-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Canal de Procedencia</th>
+                <th class="text-center">Cantidad Reservas</th>
+                <th class="text-center">% Participación</th>
+                <th class="text-end">Tarifa Promedio (ADR)</th>
+                <th class="text-end">Aporte RevPAR</th>
+                <th class="text-end">Ingreso Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in canales %}
+            <tr>
+                <td class="fw-bold">{{ c.nombre }}</td>
+                <td class="text-center">{{ c.cantidad }}</td>
+                <td class="text-center">{{ c.porcentaje }}%</td>
+                <td class="text-end text-success fw-bold">${{ c.adr }}</td>
+                <td class="text-end text-primary fw-bold">${{ c.revpar_aporte }}</td>
+                <td class="text-end fw-bold">${{ c.ingreso }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">No se encontraron registros de canales.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Fichas de Validación QR por Canal -->
+    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-qr-code text-primary me-2"></i>Códigos de Autenticación por Canal</h5>
+    <div class="row g-3 mb-4">
+        {% for c in canales %}
+        <div class="col-6">
+            <div class="border rounded p-3 bg-light d-flex align-items-center">
+                <div id="qrcode_canal_{{ forloop.counter }}" class="me-3 bg-white p-1 border rounded"></div>
+                <div>
+                    <h6 class="fw-bold text-uppercase mb-1">{{ c.nombre }}</h6>
+                    <p class="mb-0 small text-muted">Reservas: <strong>{{ c.cantidad }}</strong></p>
+                    <p class="mb-0 small text-muted">ADR: <strong>${{ c.adr }}</strong></p>
+                    <p class="mb-0 small text-primary">Ingreso: <strong>${{ c.ingreso }}</strong></p>
+                </div>
+            </div>
+            <script type="text/javascript">
+                new QRCode(document.getElementById("qrcode_canal_{{ forloop.counter }}"), { 
+                    text: "CANAL: {{ c.nombre|escapejs }} | RESERVAS: {{ c.cantidad }} | INGRESO: ${{ c.ingreso }}", 
+                    width: 72, 
+                    height: 72, 
+                    colorDark : "#000000", 
+                    colorLight : "#ffffff"
+                }); 
+            </script>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Sección de Firmas de Responsabilidad -->
+    <div class="row mt-5 pt-4 text-center">
+        <div class="col-6">
+            <p>___________________________________</p>
+            <p class="fw-bold mb-0">GERENTE DE OPERACIONES / HOTEL</p>
+            <small class="text-muted">C.I.: ___________________</small>
+        </div>
+        <div class="col-6">
+            <p>___________________________________</p>
+            <p class="fw-bold mb-0">AUDITOR / AUDITORÍA FINANCIERA</p>
+            <small class="text-muted">C.I.: ___________________</small>
+        </div>
+    </div>
+
+    <!-- Botón de impresión visible solo en pantalla -->
+    <div class="text-center mt-4 no-print">
+        <button onclick="window.print();" class="btn btn-primary btn-lg shadow">
+            <i class="bi bi-printer me-2"></i>Imprimir o Guardar como PDF
+        </button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    new QRCode(document.getElementById("qrcode_general"), { 
+        text: window.location.href, 
+        width: 80, 
+        height: 80, 
+        colorDark : "#0d6efd", 
+        colorLight : "#ffffff"
+    }); 
+    
+    // Auto-imprimir al cargar
+    window.onload = function() {
+        setTimeout(function() {
+            window.print();
+        }, 500);
+    };
+</script>
+</body>
+</html>

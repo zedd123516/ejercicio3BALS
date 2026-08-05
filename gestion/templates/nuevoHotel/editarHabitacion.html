@@ -1,0 +1,112 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <br>
+                <h1><b>Actualizar Habitación</b></h1>
+                <hr>
+                <form id="form_editar_habitacion" action="/procesar-actualizacion-habitacion/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ habitacion.id }}" readonly>
+
+                    <b>Número de Habitación:</b> <br>
+                    <input required placeholder="Ingrese el número de habitación" class="form-control" type="text" name="numero" value="{{ habitacion.numero }}">
+                    <br>
+
+                    <b>Tipo de Habitación:</b> <br>
+                    <select required class="form-control" name="tipo">
+                        <option value="Standard" {% if habitacion.tipo == 'Standard' %}selected{% endif %}>Standard</option>
+                        <option value="Deluxe" {% if habitacion.tipo == 'Deluxe' %}selected{% endif %}>Deluxe</option>
+                        <option value="Suite" {% if habitacion.tipo == 'Suite' %}selected{% endif %}>Suite</option>
+                        <option value="Junior" {% if habitacion.tipo == 'Junior' %}selected{% endif %}>Junior</option>
+                    </select>
+                    <br>
+
+                    <b>Capacidad (personas):</b> <br>
+                    <input required placeholder="Ingrese la capacidad de personas" class="form-control" type="number" name="capacidad" value="{{ habitacion.capacidad }}">
+                    <br>
+
+                    <b>Precio por Noche:</b> <br>
+                    <input required placeholder="Ingrese el precio por noche" class="form-control" type="number" step="0.01" name="precio_noche" value="{{ habitacion.precio_noche }}">
+                    <br>
+
+                    <b>Piso:</b> <br>
+                    <input required placeholder="Ingrese el número de piso" class="form-control" type="number" name="piso" value="{{ habitacion.piso }}">
+                    <br>
+
+                    <b>Estado:</b> <br>
+                    <select class="form-control" name="estado">
+                        <option value="disponible" {% if habitacion.estado == 'disponible' %}selected{% endif %}>Disponible</option>
+                        <option value="ocupada" {% if habitacion.estado == 'ocupada' %}selected{% endif %}>Ocupada</option>
+                        <option value="mantenimiento" {% if habitacion.estado == 'mantenimiento' %}selected{% endif %}>Mantenimiento</option>
+                    </select>
+                    <br> <br>
+
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" type="submit">
+                            <i class="bi bi-check-circle"></i> Actualizar
+                        </button>
+                        <a href="/habitaciones/" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#form_editar_habitacion").validate({
+            rules:{
+                numero:{
+                    required: true
+                },
+                tipo:{
+                    required: true
+                },
+                capacidad:{
+                    required: true,
+                    min: 1,
+                    number: true
+                },
+                precio_noche:{
+                    required: true,
+                    min: 0,
+                    number: true
+                },
+                piso:{
+                    required: true,
+                    min: 1,
+                    number: true
+                }
+            },
+            messages:{
+                numero:{
+                    required: "Por favor ingrese el número de habitación"
+                },
+                tipo:{
+                    required: "Por favor seleccione el tipo de habitación"
+                },
+                capacidad:{
+                    required: "Por favor ingrese la capacidad",
+                    min: "La capacidad debe ser de al menos 1 persona",
+                    number: "Por favor ingrese un número válido"
+                },
+                precio_noche:{
+                    required: "Por favor ingrese el precio por noche",
+                    min: "El precio debe ser un valor positivo",
+                    number: "Por favor ingrese un monto válido"
+                },
+                piso:{
+                    required: "Por favor ingrese el piso",
+                    min: "El piso debe ser mayor o igual a 1",
+                    number: "Por favor ingrese un número válido"
+                }
+            }
+        });
+    </script>
+{% endblock %}

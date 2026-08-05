@@ -1,0 +1,60 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+{% block contenido %}
+    <center>
+        <br>
+        <h1><b>Amas de Llaves Registradas</b>            
+            <a href="/nuevo-ama/" class="btn btn-info text-white"> 
+                <i class="bi bi-plus-circle"></i>
+                Nueva Ama de Llaves
+            </a>
+            <!-- target="_blank" -->
+            <a href="/reporteAmas/" onclick="window.open(this.href,'Reporte Amas de Llaves','width=800,height=950,resizable=yes,scrollbars=yes'); return false;" class="btn btn-dark">
+                <i class="bi bi-eye"></i>
+                Imprimir Reporte
+            </a>        
+        </h1>
+        <hr>
+    </center>
+    <br>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <table id="tbl_amas" class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Turno</th>
+                        <th>Teléfono</th>
+                        <th>Piso Asignado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ama in amas %}
+                    <tr>
+                        <td>{{ ama.nombre }}</td>
+                        <td>{{ ama.turno }}</td>
+                        <td>{{ ama.telefono }}</td>
+                        <td>{{ ama.piso_asignado }}</td>
+                        <td>
+                            <a href="/editar-ama/{{ ama.id }}/" class="btn btn-outline-warning btn-sm" title="Editar Ama de Llaves">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="#" onclick="confirmacion(event, '/eliminar-ama/{{ ama.id }}/')" class="btn btn-outline-danger btn-sm" title="Eliminar Ama de Llaves">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted">No hay amas de llaves registradas</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let table = new DataTable('#tbl_amas');
+    </script>
+{% endblock %}
