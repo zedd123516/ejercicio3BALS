@@ -1,18 +1,25 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <!--Etiqueta &mdash;  -->
-  <!--Para Una barra para extender y poner mas informacion-->
-  <title>Inmobiliaria &mdash; Gestión de Proyectos</title>
-  <meta name="description" content="">
-  <meta name="keywords" content="">
+  <title>HotelZ &mdash; Gestión de Hoteles y Reservas</title>
+  <meta name="description" content="Aplicación Progresiva Web (PWA) de HotelZ para gestión de proyectos hoteleros, habitaciones y reservas.">
+  <meta name="keywords" content="Hotel, Reservas, PWA, Gestión Hotelera, HotelZ">
 
-  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
-  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HotelZ">
+  <link rel="apple-touch-icon" href="{% static 'assets/img/pwa/apple-touch-icon.png' %}">
+
+  <link href="{% static 'assets/img/pwa/favicon-pwa.png' %}" rel="icon" type="image/png">
+  <link href="{% static 'assets/img/pwa/apple-touch-icon.png' %}" rel="apple-touch-icon">
 
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -46,6 +53,7 @@
 
       <a href="/" class="logo d-flex align-items-center me-auto">
         <h1 class="sitename" style="color:blue">HotelZ</h1>
+        <span class="badge bg-primary ms-2 rounded-pill d-none d-sm-inline-block" style="font-size: 0.7rem; vertical-align: middle;">PWA</span>
       </a>
 
       <nav id="navmenu" class="navmenu">
@@ -71,12 +79,44 @@
             <li><a href="/login/" class="btn btn-primary btn-sm text-white ms-2 px-3">Iniciar Sesión</a></li>
             <li><a href="/registro/" class="btn btn-outline-primary btn-sm text-dark ms-2 px-3">Registrarse</a></li>
           {% endif %}
+          <!-- Botón para instalar PWA App -->
+          <li id="pwa-install-li" style="display: none;">
+            <button id="pwa-install-btn" class="btn btn-success btn-sm text-white ms-2 px-3 rounded-pill fw-bold shadow-sm">
+              <i class="bi bi-download me-1"></i> Instalar App
+            </button>
+          </li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
     </div>
   </header>
+
+  <!-- Banner Flotante PWA para Celulares/Escritorio -->
+  <div id="pwa-toast-banner" class="position-fixed bottom-0 start-50 translate-middle-x p-3 style-pwa-toast" style="z-index: 1080; display: none; width: 90%; max-width: 450px;">
+    <div class="card border-0 shadow-lg bg-primary text-white rounded-4 overflow-hidden">
+      <div class="card-body p-3 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <img src="{% static 'assets/img/pwa/icon-96x96.png' %}" alt="HotelZ App" class="rounded-3 me-3" style="width: 48px; height: 48px;">
+          <div>
+            <h6 class="fw-bold mb-0 text-white">Instalar App HotelZ</h6>
+            <small class="text-white-50">Accede más rápido y úsala sin conexión</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button id="pwa-toast-install-btn" class="btn btn-light text-primary btn-sm rounded-pill px-3 fw-bold shadow-sm">Instalar</button>
+          <button type="button" class="btn-close btn-close-white" id="pwa-toast-close-btn" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Banner de Estado de Conexión (Online/Offline) -->
+  <div id="connection-status-toast" class="position-fixed top-0 start-50 translate-middle-x p-3 style-conn-toast" style="z-index: 1090; display: none; width: 90%; max-width: 400px;">
+    <div id="connection-card" class="card border-0 shadow-lg text-white rounded-pill px-3 py-2 d-flex align-items-center justify-content-center text-center fw-bold">
+      <span id="connection-text"></span>
+    </div>
+  </div>
 
   <main class="main">
     {% block contenido %}
@@ -85,9 +125,9 @@
 
   <footer id="footer" class="footer position-relative light-background">
     <div class="container copyright text-center mt-4">
-      <p>© <span>Copyright</span> <strong class="px-1 sitename">Mentor</strong> <span>All Rights Reserved</span></p>
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">HotelZ PWA</strong> <span>All Rights Reserved</span></p>
       <div class="credits">
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a> Distributed by <a href="https://themewagon.com">ThemeWagon</a>
+        Diseñado con tecnología <span class="badge bg-primary">Progressive Web App</span> para experiencia nativa.
       </div>
     </div>
   </footer>
@@ -139,6 +179,97 @@
           }
         });
     }
+  </script>
+
+  <!-- Registrador de Service Worker y Manejo de Eventos PWA -->
+  <script>
+    let deferredPrompt;
+    const pwaInstallLi = document.getElementById('pwa-install-li');
+    const pwaInstallBtn = document.getElementById('pwa-install-btn');
+    const pwaToastBanner = document.getElementById('pwa-toast-banner');
+    const pwaToastInstallBtn = document.getElementById('pwa-toast-install-btn');
+    const pwaToastCloseBtn = document.getElementById('pwa-toast-close-btn');
+
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(function(registration) {
+            console.log('[PWA] Service Worker registrado con exito en scope:', registration.scope);
+          })
+          .catch(function(err) {
+            console.error('[PWA] Error al registrar Service Worker:', err);
+          });
+      });
+    }
+
+    // Capturar evento beforeinstallprompt para mostrar opciones de instalación
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+
+      if (pwaInstallLi) pwaInstallLi.style.display = 'inline-block';
+      if (pwaToastBanner && !localStorage.getItem('pwa_toast_dismissed')) {
+        pwaToastBanner.style.display = 'block';
+      }
+    });
+
+    // Función para desencadenar la instalación
+    function triggerPWAInstall() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('[PWA] Usuario aceptó la instalación');
+        } else {
+          console.log('[PWA] Usuario rechazó la instalación');
+        }
+        deferredPrompt = null;
+        if (pwaInstallLi) pwaInstallLi.style.display = 'none';
+        if (pwaToastBanner) pwaToastBanner.style.display = 'none';
+      });
+    }
+
+    if (pwaInstallBtn) pwaInstallBtn.addEventListener('click', triggerPWAInstall);
+    if (pwaToastInstallBtn) pwaToastInstallBtn.addEventListener('click', triggerPWAInstall);
+    if (pwaToastCloseBtn) {
+      pwaToastCloseBtn.addEventListener('click', () => {
+        if (pwaToastBanner) pwaToastBanner.style.display = 'none';
+        localStorage.setItem('pwa_toast_dismissed', 'true');
+      });
+    }
+
+    // Ocultar botones una vez instalada la app
+    window.addEventListener('appinstalled', () => {
+      console.log('[PWA] App HotelZ fue instalada exitosamente');
+      if (pwaInstallLi) pwaInstallLi.style.display = 'none';
+      if (pwaToastBanner) pwaToastBanner.style.display = 'none';
+    });
+
+    // Notificaciones de Conexión (Online / Offline)
+    function showConnectionStatus(isOnline) {
+      const toast = document.getElementById('connection-status-toast');
+      const card = document.getElementById('connection-card');
+      const text = document.getElementById('connection-text');
+
+      if (!toast || !card || !text) return;
+
+      if (isOnline) {
+        card.className = "card border-0 shadow-lg text-white bg-success rounded-pill px-3 py-2 text-center fw-bold";
+        text.innerHTML = '<i class="bi bi-wifi me-2"></i> Conexión restablecida';
+      } else {
+        card.className = "card border-0 shadow-lg text-white bg-warning text-dark rounded-pill px-3 py-2 text-center fw-bold";
+        text.innerHTML = '<i class="bi bi-wifi-off me-2"></i> Modo sin conexión activo (PWA Offline)';
+      }
+
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 4000);
+    }
+
+    window.addEventListener('online', () => showConnectionStatus(true));
+    window.addEventListener('offline', () => showConnectionStatus(false));
   </script>
 
   <style>

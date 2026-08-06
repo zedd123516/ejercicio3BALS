@@ -98,4 +98,9 @@ urlpatterns = [
     path('reporteClientes/', views.reporteClientes, name='reporteClientes'),
     path('reporteMisReservas/', views.reporteMisReservas, name='reporteMisReservas'),
     path('reporteCanalesPdf/', views.reporteCanalesPdf, name='reporteCanalesPdf'),
+
+    # Rutas PWA
+    path('manifest.json', views.pwa_manifest, name='pwa_manifest'),
+    path('sw.js', views.pwa_serviceworker, name='pwa_serviceworker'),
+    path('offline/', views.offline_view, name='offline'),
 ]

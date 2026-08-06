@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.db.models import Count, Sum
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -1388,3 +1388,28 @@ def reporteCanalesPdf(request):
         'canales': metrics['canales'],
         'fecha_generacion': datetime.now().strftime('%d/%m/%Y %H:%M'),
     })
+
+
+# ==================== VISTAS PWA ====================
+
+def pwa_manifest(request):
+    """Servir manifest.json desde el backend con Content-Type correcto."""
+    manifest_path = settings.BASE_DIR / 'ejercicio3BALS' / 'static' / 'manifest.json'
+    with open(manifest_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    return HttpResponse(content, content_type='application/manifest+json')
+
+
+def pwa_serviceworker(request):
+    """Servir sw.js con header Service-Worker-Allowed para permitir scope '/'."""
+    sw_path = settings.BASE_DIR / 'ejercicio3BALS' / 'static' / 'sw.js'
+    with open(sw_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    response = HttpResponse(content, content_type='application/javascript')
+    response['Service-Worker-Allowed'] = '/'
+    return response
+
+
+def offline_view(request):
+    """Vista de contingencia para cuando la app está sin conexión."""
+    return render(request, 'offline.html')
